@@ -1,8 +1,9 @@
-[![Build Status](https://travis-ci.com/vrunge/M2algorithmique.svg?branch=main)](https://travis-ci.com/vrunge/M2Algorithmique)
-
 ---
 output: github_document
 ---
+
+[![Build Status](https://travis-ci.com/vrunge/M2algorithmique.svg?branch=main)](https://travis-ci.com/vrunge/M2Algorithmique)
+
 
 # M2algorithmique Vignette
 ### Vincent Runge

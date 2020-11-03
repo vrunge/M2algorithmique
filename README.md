@@ -19,14 +19,14 @@
 
 ## Quick Start
 
-The `M2algorithmique` R package is an **example package** developed for students building their own R/Rcpp package as part of the **algorithmic M2 courses**. This package contains two algorithmic strategies (**insertion sort** and **heap sort**) implemented in R and in Rcpp.
+The `M2algorithmique` R package is an **example package** developed for students building their own R/Rcpp package as part of the **algorithmic M2 courses in Data Science master's program at Evry Paris-Saclay University**. This package contains two algorithmic strategies (**insertion sort** and **heap sort**) implemented in R and in Rcpp.
 
-Insertion sort is of time complexity *O*(*n*<sup>2</sup>) as heap sort is *O*(*n*log(*n*)) (worst case complexity). We aim at highlighting two important features with this package:
+Insertion sort is of time complexity ***O*(*n*<sup>2</sup>)** as heap sort is ***O*(*n*log(*n*))** (worst case complexity). We aim at highlighting two important features with this package:
 
 1.  Rcpp algorithms are **much more efficient** than their R counterpart
 2.  Time complexities **can be compared to** one another
 
-<span style="color:magenta">All the simulations presented in this README file are available in the `mesTests.R` file in the **forStudents** folder as well as the Rmd file generating this README.md.</span>.
+<span style="color:red;">All the simulations presented in this README file are available in the `myTests.R` file in the **forStudents** folder which also contains the Rmd file generating this README.md.</span>
 
 ### Package installation
 
@@ -53,13 +53,13 @@ We've implemeted 4 algorithms:
 -   `insertion_sort_Rcpp`
 -   `heap_sort_Rcpp`
 
-They all have a simple argument: the unsorted vector `v`.
+They all have a unique argument: the unsorted vector `v`.
 
 ``` r
 v
 ```
 
-    ##  [1]  8  1 10  5  6  2  9  7  4  3
+    ##  [1]  9  6 10  3  2  8  7  1  4  5
 
 ``` r
 insertion_sort(v)
@@ -73,7 +73,7 @@ insertion_sort(v)
 
 ## Comparing time complexity of the 4 algorithms
 
-We run all the following example at a fixed vector length `n = 10000`.
+We run all the following examples at fixed vector length `n = 10000`.
 
 ### One simulation
 
@@ -91,20 +91,25 @@ one.simu <- function(n, type = "sample", func = "insertion_sort")
 }
 ```
 
-We evaluate the time with a given n over the 4 algorithms
+We evaluate the time with a given n over the 4 algorithms. We choose
 
 ``` r
 n <- 10000
+```
+
+and we get:
+
+``` r
 one.simu(n, func = "insertion_sort")
 ```
 
-    ## [1] 3.151
+    ## [1] 3.399
 
 ``` r
 one.simu(n, func = "heap_sort")
 ```
 
-    ## [1] 0.262
+    ## [1] 0.476
 
 ``` r
 one.simu(n, func = "insertion_sort_Rcpp")
@@ -116,18 +121,16 @@ one.simu(n, func = "insertion_sort_Rcpp")
 one.simu(n, func = "heap_sort_Rcpp")
 ```
 
-    ## [1] 0.001
+    ## [1] 0.002
 
 ### Some comparisons
 
-we compare the running time at a given length n with repeated executions (nbSimus times)
+we compare the running time at a given length `n` with repeated executions (`nbSimus` times)
 
 ``` r
 nbSimus <- 10
-time1 <- 0
-time2 <- 0
-time3 <- 0
-time4 <- 0
+time1 <- 0; time2 <- 0; time3 <- 0; time4 <- 0
+
 for(i in 1:nbSimus){time1 <- time1 + one.simu(n, func = "insertion_sort")}
 for(i in 1:nbSimus){time2 <- time2 + one.simu(n, func = "heap_sort")}
 for(i in 1:nbSimus){time3 <- time3 + one.simu(n, func = "insertion_sort_Rcpp")}
@@ -137,34 +140,36 @@ for(i in 1:nbSimus){time4 <- time4 + one.simu(n, func = "heap_sort_Rcpp")}
 time1/time3
 ```
 
-    ## [1] 108.9512
+    ## [1] 111.1971
 
 ``` r
 time2/time4
 ```
 
-    ## [1] 162.0588
+    ## [1] 164.5455
 
 ``` r
 #gain insertion -> heap
 time1/time2
 ```
 
-    ## [1] 11.34991
+    ## [1] 12.93204
 
 ``` r
 time3/time4
 ```
 
-    ## [1] 16.88235
+    ## [1] 19.13636
 
 ``` r
 #max gain
 time1/time4
 ```
 
-    ## [1] 1839.353
+    ## [1] 2127.909
 
 <a id="oth"></a>
 
 ## Coming soon: other simulations...
+
+We want to verify the worst case time complexity and/or the average time complexity of these algorithms.

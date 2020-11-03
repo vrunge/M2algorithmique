@@ -5,6 +5,7 @@
 #'
 #' @param v an unsorted vector of numeric data
 #' @return a sorted vector
+#' @export
 insertion_sort_Rcpp <- function(v) {
     .Call(`_M2algorithmique_insertion_sort_Rcpp`, v)
 }
@@ -17,6 +18,7 @@ build_heap_Rcpp <- function(heap, i, n) {
 #'
 #' @param v an unsorted vector of numeric data
 #' @return a sorted vector
+#' @export
 heap_sort_Rcpp <- function(v) {
     .Call(`_M2algorithmique_heap_sort_Rcpp`, v)
 }

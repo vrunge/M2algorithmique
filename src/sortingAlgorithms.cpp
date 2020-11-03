@@ -12,7 +12,7 @@ using namespace Rcpp; //to use the NumericVector object
 std::vector<double> insertion_sort_Rcpp(std::vector<double> v)
 {
   double key;
-  unsigned int i;
+  int i;
   for(unsigned int j = 1; j < v.size(); j++)
   {
     key = v[j];

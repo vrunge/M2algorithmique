@@ -1,0 +1,20 @@
+{
+    "collab_server" : "",
+    "contents" : "rm(list=ls())\n\n\nsource(\"simulations/iso_functions.R\")\nlibrary(parallel)\ncores <- detectCores()\ncores <- 40\n#############\n############# one.simu\n#############\n\none.simu <- function(i,\n                     n = 10^2,\n                     type = \"isolinear\",\n                     noise = \"gauss\",\n                     sigma = 10,\n                     df = 3,\n                     pcorr = 0.3)\n{\n  # PENALTY + K\n  myK <- 3 * sigma\n  myPen <- 2 * sigma * sigma * log(n)\n  \n  #DATA\n  data <- simuData(n, type = type, noise = noise, pcorr = pcorr, df = df, sigma = sigma)\n  ## sigma <- sdDiff(data$y) # SIGMA ESTIMATION\n  \n  #Estimation signal\n  estim <- estimateAllSeg(data, K = myK, pen = myPen)\n  \n  #all MSE (x9)\n  ref <- MSEdataSignal(data$y, data$signal)\n  ref_lin <- MSEdataSignal(data$y, data$signal, method = \"linear\")\n  mseAll <- MSEall(data, estim)\n  \n  #ind, method, mse, beta, K\n  df <- data.frame(numeric(0), character(), numeric(0), numeric(0), numeric(0), stringsAsFactors = FALSE)\n  colnames(df) <- c(\"index\", \"method\", \"MSE\", \"penalty\", \"K\")\n  df[1,] <- c(i,\"MSE\", ref, 0, Inf)\n  df[2,] <- c(i,\"MSE_linearFit\", ref_lin, 0, Inf)\n  df[3,] <- c(i,\"isoreg\", mseAll[1], 0, Inf)\n  df[4,] <- c(i,\"reg_1d_L2\", mseAll[2], 0, Inf)\n  df[5,] <- c(i,\"reg_1d_L1\", mseAll[3], 0, Inf)\n  df[6,] <- c(i,\"gfpop\", mseAll[4], 0, Inf)\n  df[7,] <- c(i,\"gfpop\", mseAll[5], 0, myK)\n  df[8,] <- c(i,\"gfpop\", mseAll[6], myPen, Inf)\n  df[9,] <- c(i,\"gfpop\", mseAll[7], myPen, myK)\n  return(df)\n}\n\n\n#########################################################################\nnbSimu <- 100\nlres_1 <- mclapply(1:nbSimu, FUN = one.simu,\n                   n = 10^4,\n                   type = \"isolinear\",\n                   noise = \"gauss\",\n                   sigma = 1,\n                   mc.cores = cores)\n\nlres_2 <- mclapply(1:nbSimu, FUN = one.simu,\n                   n = 10^4,\n                   type = \"isolinear\",\n                   noise = \"student\",\n                   sigma = 1,\n                   df = 3,\n                   mc.cores = cores)\n\nlres_3 <- mclapply(1:nbSimu, FUN = one.simu,\n                   n = 10^4,\n                   type = \"isolinear\",\n                   noise = \"corrupted\",\n                   sigma = 1,\n                   pcorr = 0.3,\n                   mc.cores = cores)\n\ndf_linear_gauss <- do.call(rbind, lres_1)\ndf_linear_student <- do.call(rbind, lres_2)\ndf_linear_corrupted <- do.call(rbind, lres_3)\n\nsave(df_linear_gauss, file=\"df_linear_gauss.RData\")\nsave(df_linear_student, file=\"df_linear_student.RData\")\nsave(df_linear_corrupted, file=\"df_linear_corrupted.RData\")\n\n",
+    "created" : 1604421591943.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "269643381",
+    "id" : "97FD71EC",
+    "lastKnownWriteTime" : 1586166366,
+    "last_content_update" : 1586166366,
+    "path" : "~/MYRPACKAGES/gfpop_testing_version/simulations/iso_simu_Table1.R",
+    "project_path" : null,
+    "properties" : {
+    },
+    "relative_order" : 7,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

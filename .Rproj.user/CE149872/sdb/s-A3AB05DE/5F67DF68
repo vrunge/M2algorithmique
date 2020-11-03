@@ -1,0 +1,20 @@
+{
+    "collab_server" : "",
+    "contents" : "#include <Rcpp.h> //to use the NumericVector object\nusing namespace Rcpp; //to use the NumericVector object\n\n#include<vector> //to use std::vector<double>\n\n//' Insertion sort algorithm using C++\n//'\n//' @param v an unsorted vector of numeric data\n//' @return a sorted vector\n// [[Rcpp::export]] //mandatory to export the function\nstd::vector<double> insertion_sort_Rcpp(std::vector<double> v)\n{\n  double key;\n  int i;\n  for(int j = 1; j < v.size(); j++)\n  {\n    key = v[j];\n    i = j - 1;\n    while(i >= 0 && v[i] > key)\n    {\n      v[i + 1] = v[i];\n      i = i - 1;\n    }\n    v[i + 1] = key;\n  }\n  return v;\n}\n\n\n\n// [[Rcpp::export]]\nNumericVector build_heap_Rcpp(NumericVector heap, int i, int n)\n{\n  int k = i;\n  int l = 2*k;\n  double temp;\n  while(l <= n)\n  {\n    if((l < n) && (heap[l-1] < heap[l])){l = l + 1;} \n    if(heap[k-1] < heap[l-1]) \n    {\n      temp = heap[k-1];\n      heap[k-1] = heap[l-1];\n      heap[l-1] = temp;\n      k = l;\n      l = 2*k;\n    }\n    else\n    {\n      l = n + 1;\n    }\n  }\n  return(heap);\n}\n\n\n//' Heap sort algorithm using C++\n//'\n//' @param v an unsorted vector of numeric data\n//' @return a sorted vector\n// [[Rcpp::export]]\nNumericVector heap_sort_Rcpp(NumericVector v)\n{\n  int n = v.size();\n  double temp;\n    for(int i = (n/2); i > 0; i--)\n    {\n      build_heap_Rcpp(v, i, n);\n    }\n    for(int i = n; i > 1; i--)\n    {\n      temp = v[i-1];\n      v[i-1] = v[0];\n      v[0] = temp;\n      build_heap_Rcpp(v, 1, i-1);\n    }\n  \n  return v;\n}\n",
+    "created" : 1604397225808.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "1630343055",
+    "id" : "5F67DF68",
+    "lastKnownWriteTime" : 1604420948,
+    "last_content_update" : 1604420948107,
+    "path" : "~/Dropbox/A4_ENSEIGNEMENTS/M2_DS_Algorithmique/packagesRcpp/M2algorithmique/src/sortingAlgorithms.cpp",
+    "project_path" : "src/sortingAlgorithms.cpp",
+    "properties" : {
+    },
+    "relative_order" : 3,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "cpp"
+}

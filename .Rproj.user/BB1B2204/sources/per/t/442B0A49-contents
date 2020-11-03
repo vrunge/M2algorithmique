@@ -1,0 +1,234 @@
+---
+title: "Anticolinergic project : from raw data to our dataframe"
+author: "Vincent Runge"
+date: "16/09/2020"
+output:
+  prettydoc::html_pretty:
+    toc: true
+    theme: cayman
+    highlight: github
+    df_print : paged
+---
+
+```{r setup, include = FALSE, echo = FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r, echo = FALSE}
+rm(list = ls())
+```
+
+
+```{r, results='hide', message=FALSE, warning=FALSE, echo=FALSE}
+library(tidyverse, quietly = TRUE) # Pour ggplot2 et la manipulation des data frames
+library(gtools) # Pour le tri des data frames
+library(forcats) # Pour les factors
+library(lubridate) # Pour les dates
+library(readxl) # Lecture des fichiers xlsx
+library(stringr) # Pour manipuler les chaînes de caractères
+library(stringi) # Pour manipuler les chaînes de caractères
+library(reshape2) # Pour les data frames
+```
+
+# Lecture des données 
+
+```{r, warning=FALSE}
+setwd("C:/Users/runge/Dropbox/A9_anticholinergique/#MyRCode/General/")
+prescriptions <- read.csv(
+  file = "CH-Rouffach-Prescriptions-2008-2018_v1.txt",
+  sep = "|", dec = ".", header = TRUE, quote = "", fill = FALSE)
+```
+
+Vérification de taille et type (= lecture correcte)
+
+```{r}
+apply(prescriptions, 2, typeof)
+dim(prescriptions)
+```
+
+
+# Type de chaque variable
+
+On change les types des variables dont le type n'est pas le bon.
+```{r}
+# Conversion de IMC en réel
+prescriptions <- prescriptions %>% mutate(IMC = as.double(IMC)/100)
+
+# Conversion de Si.besoin en facteur
+prescriptions <- prescriptions %>%
+  mutate(Si.besoin = as.factor(Si.besoin))
+
+# Conversion de Heure.de.prise en facteur
+prescriptions <- prescriptions %>%
+  mutate(Heure.de.prise = as.factor(Heure.de.prise))
+
+# Conversion de Rythme.date.de.debut en date
+prescriptions <- prescriptions %>%
+  mutate(Rythme.date.de.debut =
+           as.Date(Rythme.date.de.debut,
+                            format = "%d/%m/%Y"))
+
+# Conversion de Date.heure.debut.d.adm.
+# (date avec heures minutes)
+prescriptions <- prescriptions %>%
+  mutate(Date.heure.debut.d.adm. = 
+           as.POSIXct(as.character(Date.heure.debut.d.adm.), 
+                      format = "%d/%m/%Y %H:%M"))
+
+# Conversion de Date.heure.fin.d.adm.
+# (date avec heures minutes)
+prescriptions <- prescriptions %>% 
+    mutate(Date.heure.fin.d.adm. =
+           as.POSIXct(as.character(Date.heure.fin.d.adm.), 
+                      format = "%d/%m/%Y %H:%M"))
+```
+
+Les DCI non renseignés seront maintenant indiqués comme NA.
+```{r}
+levels(prescriptions$DCI.produit)[
+  levels(prescriptions$DCI.produit) == ""] <- NA
+```
+
+Les observations non renseignées seront maintenant indiquées comme NA.
+```{r}
+levels(prescriptions$observation.ligne.prescription)[
+  levels(prescriptions$observation.ligne.prescription) == ""] <- NA
+```
+
+On corrige la valeur extrême pour la taille par NA.
+```{r}
+prescriptions$Taille[prescriptions$Taille == 0.02] <- NA
+```
+
+```{r}
+# Conversion de DCI.produit en chaîne de caractères
+prescriptions <- prescriptions %>%
+  mutate(DCI.produit = as.character(DCI.produit))
+
+# Conversion de Nom.commercial.produit en chaîne de caractères
+prescriptions <- prescriptions %>%
+  mutate(Nom.commercial.produit = as.character(Nom.commercial.produit))
+
+# Conversion de observation.ligne.prescription
+# en chaîne de caractères
+prescriptions <- prescriptions %>% 
+    mutate(observation.ligne.prescription =
+             as.character(observation.ligne.prescription))
+```
+
+Maintenant, les dates ont le bon type.
+```{r}
+class(prescriptions$Date.heure.debut.d.adm.)
+class(prescriptions$Date.heure.fin.d.adm.)
+```
+
+On affiche le type des autres variables.
+```{r}
+subset(prescriptions, select =
+         -c(Date.heure.debut.d.adm., Date.heure.fin.d.adm.)) %>%
+  dplyr::summarise_all(class) %>% tidyr::gather(variable, class)
+```
+
+# Etudes des valeurs manquantes
+
+```{r}
+# On compte le nombre de NA avec NA_count
+# which(is.na) renvoie les indices où is.na = TRUE 
+# => length(which(is.na)) = nombre de NA. 
+
+#NA_count <- sapply(prescriptions, function(y) length(which(is.na(y))))
+
+NA_count <- prescriptions %>% sapply(
+  function(y) sum(is.na(y))
+  )
+NA_freq <- prescriptions %>% sapply(
+  function(y) sum(is.na(y))/length(y)
+  )
+
+NA_df <- data.frame(NA_count, NA_freq = paste(round(100*NA_freq,2), "%"))
+```
+
+```{r}
+NA_df
+```
+```{r}
+rotate_x <- function(data, labels_vec, rot_angle) {
+    plt <- barplot(data, col='steelblue', xaxt="n", ylim = c(0,100), ylab = "percent of NA")
+    text(plt, par("usr")[3], labels = labels_vec, srt = rot_angle, adj = c(1.1,1.1), xpd = TRUE, cex=0.6) 
+}
+
+par(mar = c(7, 4, 2, 2) + 0.2) #add room for the rotated labels
+NA_freqNEW <- 100*NA_freq[NA_freq != 0] #order mtcars data set by column "qsec"
+
+end_point = 2*length(NA_freqNEW) - 0.5
+
+rotate_x(NA_freqNEW, names(NA_freqNEW), 90)
+```
+
+
+
+```{r}
+rm(NA_count, NA_freq)
+```
+
+Nombre de modalités pour chaque variable
+
+```{r}
+nb_modalites <- prescriptions %>%
+               sapply(function(y) length(unique(y)))
+nb_modalites
+```
+
+
+
+# Liste des médicaments et des DCI
+
+```{r}
+liste_medicaments <-
+  prescriptions %>% distinct(DCI.produit, Nom.commercial.produit) %>% arrange_all()
+length(liste_medicaments)
+```
+
+```{r}
+liste_DCI <- prescriptions %>% distinct(DCI.produit) %>%   arrange(DCI.produit)
+length(liste_DCI)
+```
+
+# Renumérotation des patients
+
+```{r}
+prescriptions <-
+  prescriptions %>% mutate(
+    Patient = as.integer(NIP.IPP)) %>% arrange(
+      NIP.IPP, Patient, Date.heure.debut.d.adm.,
+      Age.en.debut.d.adm., Date.heure.fin.d.adm.)
+
+prescriptions <- prescriptions %>% 
+    mutate(Date.heure.debut.d.adm.char. =
+           strftime(Date.heure.debut.d.adm., format = "%d/%m/%Y %H:%M")
+    )
+                               
+prescriptions <- prescriptions %>% 
+    mutate(Date.heure.fin.d.adm.char. =
+           strftime(Date.heure.fin.d.adm., format = "%d/%m/%Y %H:%M")
+           )
+```
+
+Normalisation des dates
+
+```{r}
+setwd("C:/Users/runge/Dropbox/A9_anticholinergique/#MyRCode/General/")
+load(file = "Dates_debut_normalisees.Rda")
+load(file = "Dates_fin_normalisees.Rda")
+```
+
+```{r}
+prescriptions <-
+  prescriptions %>% mutate(Date.debut.d.adm.normalisee = vecteur_debut,
+                           Date.fin.d.adm.normalisee = vecteur_fin)
+```
+
+```{r}
+rm(vecteur_debut, vecteur_fin)
+```
+

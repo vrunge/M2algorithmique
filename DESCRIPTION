@@ -1,0 +1,13 @@
+Package: M2algorithmique
+Type: Package
+Title: Example of an Rcpp package with sorting algorithms
+Version: 1.0
+Date: 2020-11-03
+Author: Vincent Runge
+Maintainer: Vincent Runge <vincent.runge@univ-evry.fr>
+Description: Examples of sorting algrithms written in different languages : R and Rcpp. We also provide a simulation file evaluating the time complexity of these algorithms. The two available algorithm are intersion sort and heap sort, both of them in R en Rcpp.
+License: GPL-3
+Encoding: UTF-8
+Imports: Rcpp (>= 1.0.5)
+LinkingTo: Rcpp
+RoxygenNote: 6.1.1

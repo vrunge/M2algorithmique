@@ -1,0 +1,20 @@
+{
+    "collab_server" : "",
+    "contents" : "\n\n################################################\n############# A simple test ####################\n################################################\n\nn <- 100 #data size \ns <- sample(n) #generate data\n\n\n# the 4 algorithms\n\ninsertion_sort(s)\nheap_sort(s)\ninsertion_sort_Rcpp(s)\nheap_sort_Rcpp(s)\n\n\n################################################################################################\n# We define the function one.simu which returns the execution time of a given algorithm\none.simu <- function(n, type = \"sample\", func = \"insertion_sort\")\n{\n  if(type == \"sample\"){v <- sample(n)}else{v <- n:1}\n  if(func == \"insertion_sort\"){t <- system.time(insertion_sort(v))[[1]]}\n  if(func == \"heap_sort\"){t <- system.time(heap_sort(v))[[1]]} \n  if(func == \"insertion_sort_Rcpp\"){t <- system.time(insertion_sort_Rcpp(v))[[1]]}\n  if(func == \"heap_sort_Rcpp\"){t <- system.time(heap_sort_Rcpp(v))[[1]]}\n  return(t)\n}\n################################################################################################\n\n###########################################################\n############# One time complexity test ####################\n###########################################################\n#we evaluate the time with a given n for the 4 algorirhms\nn <- 10000\none.simu(n, func = \"insertion_sort\")\none.simu(n, func = \"heap_sort\")\none.simu(n, func = \"insertion_sort_Rcpp\")\none.simu(n, func = \"heap_sort_Rcpp\")\n\n######################################################################### \n############# A short simulation study at fixed vector size ############# \n######################################################################### \n\n#we compare the running time at a given length n with repeated executions (nbSimus times)\nnbSimus <- 10\ntime1 <- 0\ntime2 <- 0\ntime3 <- 0\ntime4 <- 0\nfor(i in 1:nbSimus){time1 <- time1 + one.simu(n, func = \"insertion_sort\")}\nfor(i in 1:nbSimus){time2 <- time2 + one.simu(n, func = \"heap_sort\")}\nfor(i in 1:nbSimus){time3 <- time3 + one.simu(n, func = \"insertion_sort_Rcpp\")}\nfor(i in 1:nbSimus){time4 <- time4 + one.simu(n, func = \"heap_sort_Rcpp\")}\n\n#gain R -> Rcpp\ntime1/time3\ntime2/time4\n\n#gain insertion -> heap\ntime1/time2\ntime3/time4\n\n#max gain\ntime1/time4\n\n\n\n\n####### MY RESULT ####### \n#> #gain R -> Rcpp\n#  > time1/time3\n#[1] 154.6497\n#> time2/time4\n#[1] 184.1053\n#> \n#  > #gain insertion -> heap\n#  > time1/time2\n#[1] 8.709548\n#> time3/time4\n#[1] 10.36842\n#> \n#  > #max gain\n#  > time1/time4\n#[1] 1603.474\n\n\n#HERE : R to Rcpp => at least 150 times faster\n#HERE : insertion to heap => 10 times faster\n\n",
+    "created" : 1604398651942.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "1675885699",
+    "id" : "A8284A61",
+    "lastKnownWriteTime" : 1604423600,
+    "last_content_update" : 1604423600728,
+    "path" : "~/Dropbox/A4_ENSEIGNEMENTS/M2_DS_Algorithmique/packagesRcpp/M2algorithmique/tests/mesTests.R",
+    "project_path" : "tests/mesTests.R",
+    "properties" : {
+    },
+    "relative_order" : 1,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

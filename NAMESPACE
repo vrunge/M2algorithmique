@@ -1,0 +1,9 @@
+useDynLib(M2algorithmique, .registration=TRUE)
+
+export(insertion_sort)
+export(heap_sort)
+export(insertion_sort_Rcpp)
+export(heap_sort_Rcpp)
+
+importFrom(Rcpp, evalCpp)
+

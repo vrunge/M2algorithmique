@@ -26,7 +26,7 @@ Insertion sort is of time complexity ***O*(*n*<sup>2</sup>)** as heap sort is **
 1.  Rcpp algorithms are **much more efficient** than their R counterpart
 2.  Time complexities **can be compared to** one another
 
-<span style="color:red;">All the simulations presented in this README file are available in the `myTests.R` file in the **forStudents** folder which also contains the Rmd file generating this README.md.</span>
+*All the simulations presented in this README file are available in the `myTests.R` file in the forStudents folder which also contains the Rmd file generating this README.md.*
 
 ### Package installation
 
@@ -59,7 +59,7 @@ They all have a unique argument: the unsorted vector `v`.
 v
 ```
 
-    ##  [1]  9  6 10  3  2  8  7  1  4  5
+    ##  [1]  3  7  1  2  4  6 10  5  8  9
 
 ``` r
 insertion_sort(v)
@@ -103,19 +103,19 @@ and we get:
 one.simu(n, func = "insertion_sort")
 ```
 
-    ## [1] 3.399
+    ## [1] 3.12
 
 ``` r
 one.simu(n, func = "heap_sort")
 ```
 
-    ## [1] 0.476
+    ## [1] 0.238
 
 ``` r
 one.simu(n, func = "insertion_sort_Rcpp")
 ```
 
-    ## [1] 0.029
+    ## [1] 0.028
 
 ``` r
 one.simu(n, func = "heap_sort_Rcpp")
@@ -140,33 +140,33 @@ for(i in 1:nbSimus){time4 <- time4 + one.simu(n, func = "heap_sort_Rcpp")}
 time1/time3
 ```
 
-    ## [1] 111.1971
+    ## [1] 104.8746
 
 ``` r
 time2/time4
 ```
 
-    ## [1] 164.5455
+    ## [1] 218.5
 
 ``` r
 #gain insertion -> heap
 time1/time2
 ```
 
-    ## [1] 12.93204
+    ## [1] 9.329519
 
 ``` r
 time3/time4
 ```
 
-    ## [1] 19.13636
+    ## [1] 19.4375
 
 ``` r
 #max gain
 time1/time4
 ```
 
-    ## [1] 2127.909
+    ## [1] 2038.5
 
 <a id="oth"></a>
 

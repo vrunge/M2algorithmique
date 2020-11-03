@@ -27,7 +27,7 @@ Insertion sort is of time complexity **$O(n^2)$** as heap sort is **$O(n\log(n))
 1. Rcpp algorithms are **much more efficient** than their R counterpart
 2. Time complexities **can be compared to** one another
 
-<span style="color:red;">All the simulations presented in this README file are available in the `myTests.R` file in the **forStudents** folder which also contains the Rmd file generating this README.md.</span>
+*All the simulations presented in this README file are available in the `myTests.R` file in the forStudents folder which also contains the Rmd file generating this README.md.*
 
 
 ### Package installation

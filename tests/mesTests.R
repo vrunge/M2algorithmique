@@ -32,7 +32,7 @@ one.simu <- function(n, type = "sample", func = "insertion_sort")
 ###########################################################
 ############# One time complexity test ####################
 ###########################################################
-#we evaluate the time with a given n for the 4 algorirhms
+#we evaluate the time with a given n for the 4 algorithms
 n <- 10000
 one.simu(n, func = "insertion_sort")
 one.simu(n, func = "heap_sort")

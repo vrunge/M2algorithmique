@@ -7,6 +7,7 @@ using namespace Rcpp; //to use the NumericVector object
 //'
 //' @param v an unsorted vector of numeric data
 //' @return a sorted vector
+//' @export
 // [[Rcpp::export]] //mandatory to export the function
 std::vector<double> insertion_sort_Rcpp(std::vector<double> v)
 {
@@ -58,6 +59,7 @@ NumericVector build_heap_Rcpp(NumericVector heap, unsigned int i, unsigned int n
 //'
 //' @param v an unsorted vector of numeric data
 //' @return a sorted vector
+//' @export
 // [[Rcpp::export]]
 NumericVector heap_sort_Rcpp(NumericVector v)
 {

@@ -3,6 +3,6 @@
 .Rproj.user
 *.o
 *.Rmd
-*.dll
+M2algorithmique.Rproj
 *.so
 

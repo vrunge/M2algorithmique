@@ -28,6 +28,14 @@ Insertion sort is of time complexity ***O*(*n*<sup>2</sup>)** as heap sort is **
 
 *All the simulations presented in this README file are available in the `myTests.R` file in the forStudents folder which also contains the Rmd file generating this README.md.*
 
+Details on the heapsort algorithm can be found on [its wikipedia page](https://en.wikipedia.org/wiki/Heapsort). This gif provides a graphical representation of its mechanisms.
+
+![](Heap_sort_example.gif)
+
+The insertion sort algorithm has a simpler structure:
+
+![](Insertion-sort-example.gif)
+
 ### Package installation
 
 You first need to install the `devtools` package, it can be done easily from Rstudio. We install the package from Github (remove the \# sign):
@@ -59,7 +67,7 @@ They all have a unique argument: the unsorted vector `v`.
 v
 ```
 
-    ##  [1]  3  7  1  2  4  6 10  5  8  9
+    ##  [1]  2  7  4  1  8  5  9  6 10  3
 
 ``` r
 insertion_sort(v)
@@ -103,19 +111,19 @@ and we get:
 one.simu(n, func = "insertion_sort")
 ```
 
-    ## [1] 3.12
+    ## [1] 3.021
 
 ``` r
 one.simu(n, func = "heap_sort")
 ```
 
-    ## [1] 0.238
+    ## [1] 0.285
 
 ``` r
 one.simu(n, func = "insertion_sort_Rcpp")
 ```
 
-    ## [1] 0.028
+    ## [1] 0.029
 
 ``` r
 one.simu(n, func = "heap_sort_Rcpp")
@@ -140,33 +148,33 @@ for(i in 1:nbSimus){time4 <- time4 + one.simu(n, func = "heap_sort_Rcpp")}
 time1/time3
 ```
 
-    ## [1] 104.8746
+    ## [1] 106.7465
 
 ``` r
 time2/time4
 ```
 
-    ## [1] 218.5
+    ## [1] 206.7143
 
 ``` r
 #gain insertion -> heap
 time1/time2
 ```
 
-    ## [1] 9.329519
+    ## [1] 10.47547
 
 ``` r
 time3/time4
 ```
 
-    ## [1] 19.4375
+    ## [1] 20.28571
 
 ``` r
 #max gain
 time1/time4
 ```
 
-    ## [1] 2038.5
+    ## [1] 2165.429
 
 <a id="oth"></a>
 

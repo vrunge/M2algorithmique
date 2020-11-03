@@ -30,6 +30,16 @@ Insertion sort is of time complexity **$O(n^2)$** as heap sort is **$O(n\log(n))
 *All the simulations presented in this README file are available in the `myTests.R` file in the forStudents folder which also contains the Rmd file generating this README.md.*
 
 
+Details on the heapsort algorithm can be found on [its wikipedia page](https://en.wikipedia.org/wiki/Heapsort). This gif provides a graphical representation of its mechanisms.
+
+![](Heap_sort_example.gif)
+
+The insertion sort algorithm has a simpler structure:
+
+![](Insertion-sort-example.gif)
+
+
+
 ### Package installation
 
 You first need to install the `devtools` package, it can be done easily from Rstudio.

@@ -11,6 +11,8 @@ output: github_document
 
 > [Comparing time complexity of the 4 algorithms](#com)
 
+> [Coming soon: other simulations...](#oth)
+
 <a id="qs"></a>
 
 ## Quick Start
@@ -124,3 +126,8 @@ time3/time4
 #max gain
 time1/time4
 ```
+
+<a id="oth"></a>
+
+## Coming soon: other simulations...
+

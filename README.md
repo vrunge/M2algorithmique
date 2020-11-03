@@ -12,17 +12,21 @@ M2algorithmique Vignette
 
 > [Comparing time complexity of the 4 algorithms](#com)
 
+> [Coming soon: other simulations...](#oth)
+
 <a id="qs"></a>
 
 Quick Start
 -----------
 
-The `M2algorithmique` R package is an **example package** developed for students building their own R/Rcpp package as part of the **algorithmic M2 courses**. This package contains two algorithmic strategies (insertion sort and heap sort) implemented in R and in Rcpp.
+The `M2algorithmique` R package is an **example package** developed for students building their own R/Rcpp package as part of the **algorithmic M2 courses**. This package contains two algorithmic strategies (**insertion sort** and **heap sort**) implemented in R and in Rcpp.
 
 Insertion sort is of time complexity *O*(*n*<sup>2</sup>) as heap sort is *O*(*n*log(*n*)) (worst case complexity). We aim at highlighting two important features with this package:
 
-1.  Rcpp algorithms are much efficient than their R counterpart
-2.  Time complexities can be compared to one another
+1.  Rcpp algorithms are **much more efficient** than their R counterpart
+2.  Time complexities **can be compared to** one another
+
+All the simulations presented in this README file are available in the `mesTests.R` file in the tests folder.
 
 ### Package installation
 
@@ -55,7 +59,7 @@ They all have a simple argument: the unsorted vector `v`.
 v
 ```
 
-    ##  [1] 10  6  4  9  8  7  5  1  2  3
+    ##  [1]  2 10  1  6  9  5  8  4  7  3
 
 ``` r
 insertion_sort(v)
@@ -95,19 +99,19 @@ n <- 10000
 one.simu(n, func = "insertion_sort")
 ```
 
-    ## [1] 3.38
+    ## [1] 3.207
 
 ``` r
 one.simu(n, func = "heap_sort")
 ```
 
-    ## [1] 0.242
+    ## [1] 0.251
 
 ``` r
 one.simu(n, func = "insertion_sort_Rcpp")
 ```
 
-    ## [1] 0.019
+    ## [1] 0.02
 
 ``` r
 one.simu(n, func = "heap_sort_Rcpp")
@@ -134,30 +138,35 @@ for(i in 1:nbSimus){time4 <- time4 + one.simu(n, func = "heap_sort_Rcpp")}
 time1/time3
 ```
 
-    ## [1] 167.7413
+    ## [1] 169.0206
 
 ``` r
 time2/time4
 ```
 
-    ## [1] 140.8421
+    ## [1] 134
 
 ``` r
 #gain insertion -> heap
 time1/time2
 ```
 
-    ## [1] 12.5994
+    ## [1] 12.23507
 
 ``` r
 time3/time4
 ```
 
-    ## [1] 10.57895
+    ## [1] 9.7
 
 ``` r
 #max gain
 time1/time4
 ```
 
-    ## [1] 1774.526
+    ## [1] 1639.5
+
+<a id="oth"></a>
+
+Coming soon: other simulations...
+---------------------------------

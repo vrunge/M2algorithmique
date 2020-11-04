@@ -301,3 +301,7 @@ lm(log(res) ~ log(vector_n))
     ## Coefficients:
     ##   (Intercept)  log(vector_n)  
     ##       -21.148          1.907
+
+
+
+[Back to Top](#top)

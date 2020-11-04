@@ -66,8 +66,6 @@ time3/time4
 time1/time4
 
 
-
-
 ####### MY RESULT ####### 
 #> #gain R -> Rcpp
 #  > time1/time3
@@ -88,4 +86,64 @@ time1/time4
 
 #HERE : R to Rcpp => at least 150 times faster
 #HERE : insertion to heap => 10 times faster
+
+
+##########################################
+############# microbenchmark ############# 
+##########################################
+
+
+library(microbenchmark)
+library("ggplot2")
+n <- 10000
+res <- microbenchmark(one.simu(n, func = "insertion_sort_Rcpp"), one.simu(n, func = "heap_sort_Rcpp"), times = 50)
+autoplot(res)
+res
+
+
+##########################################
+############# time complexity ############ 
+##########################################
+
+
+nbSimus <- 10
+vector_n <- seq(from = 10000, to = 100000, length.out = nbSimus)
+nbRep <- 10
+res_Heap <- data.frame(matrix(0, nbSimus, nbRep + 1))
+colnames(res_Heap) <- c("n", paste0("Rep",1:nbRep))
+
+j <- 1
+for(i in vector_n)
+{
+  res_Heap[j,] <- c(i, replicate(nbRep, one.simu(i, func = "heap_sort_Rcpp")))  
+  print(j)
+  j <- j + 1
+}
+
+res <- rowMeans(res_Heap[,-1])
+plot(vector_n, res, xlab = "data length", ylab = "time in second")
+
+
+####
+
+nbSimus <- 40
+vector_n <- seq(from = 5000, to = 50000, length.out = nbSimus)
+nbRep <- 10
+res_Insertion <- data.frame(matrix(0, nbSimus, nbRep + 1))
+colnames(res_Insertion) <- c("n", paste0("Rep",1:nbRep))
+
+j <- 1
+for(i in vector_n)
+{
+  res_Insertion[j,] <- c(i, replicate(nbRep, one.simu(i, func = "insertion_sort_Rcpp")))  
+  print(j)
+  j <- j + 1
+}
+
+res <- rowMeans(res_Insertion[,-1])
+plot(vector_n, res, xlab = "data length", ylab = "time in second")
+lm(log(res) ~ log(vector_n))
+
+
+
 

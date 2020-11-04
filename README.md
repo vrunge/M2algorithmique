@@ -11,9 +11,11 @@
 
 > [Quick Start](#qs)
 
-> [Comparing time complexity of the 4 algorithms](#com)
+> [The 4 algorithms at fixed data length](#com)
 
-> [Coming soon: other simulations...](#oth)
+> [Microblenchmark](#micro)
+
+> [Time complexity](#time)
 
 <a id="qs"></a>
 
@@ -67,7 +69,7 @@ They all have a unique argument: the unsorted vector `v`.
 v
 ```
 
-    ##  [1]  2  7  4  1  8  5  9  6 10  3
+    ##  [1]  1  8  2  9  7 10  5  6  4  3
 
 ``` r
 insertion_sort(v)
@@ -79,7 +81,7 @@ insertion_sort(v)
 
 <a id="com"></a>
 
-## Comparing time complexity of the 4 algorithms
+## The 4 algorithms at fixed data length
 
 We run all the following examples at fixed vector length `n = 10000`.
 
@@ -99,7 +101,7 @@ one.simu <- function(n, type = "sample", func = "insertion_sort")
 }
 ```
 
-We evaluate the time with a given n over the 4 algorithms. We choose
+We evaluate the time with a given `n` over the 4 algorithms. We choose
 
 ``` r
 n <- 10000
@@ -111,29 +113,29 @@ and we get:
 one.simu(n, func = "insertion_sort")
 ```
 
-    ## [1] 3.021
+    ## [1] 3.133
 
 ``` r
 one.simu(n, func = "heap_sort")
 ```
 
-    ## [1] 0.285
+    ## [1] 0.256
 
 ``` r
 one.simu(n, func = "insertion_sort_Rcpp")
 ```
 
-    ## [1] 0.029
+    ## [1] 0.028
 
 ``` r
 one.simu(n, func = "heap_sort_Rcpp")
 ```
 
-    ## [1] 0.002
+    ## [1] 0.001
 
 ### Some comparisons
 
-we compare the running time at a given length `n` with repeated executions (`nbSimus` times)
+we compare the running time with repeated executions (`nbSimus` times)
 
 ``` r
 nbSimus <- 10
@@ -143,41 +145,159 @@ for(i in 1:nbSimus){time1 <- time1 + one.simu(n, func = "insertion_sort")}
 for(i in 1:nbSimus){time2 <- time2 + one.simu(n, func = "heap_sort")}
 for(i in 1:nbSimus){time3 <- time3 + one.simu(n, func = "insertion_sort_Rcpp")}
 for(i in 1:nbSimus){time4 <- time4 + one.simu(n, func = "heap_sort_Rcpp")}
+```
 
+**Rcpp is 100 to 200 times faster than R for our 2 algorithms.**
+
+``` r
 #gain R -> Rcpp
 time1/time3
 ```
 
-    ## [1] 106.7465
+    ## [1] 116.0378
 
 ``` r
 time2/time4
 ```
 
-    ## [1] 206.7143
+    ## [1] 191.2857
+
+**With the data length of `10000`, heap\_sort runs 10 to 20 times faster than insert\_sort.**
 
 ``` r
 #gain insertion -> heap
 time1/time2
 ```
 
-    ## [1] 10.47547
+    ## [1] 12.60904
 
 ``` r
 time3/time4
 ```
 
-    ## [1] 20.28571
+    ## [1] 20.78571
+
+**The gain between the slow insertsort R algorithm and the faster heapsort Rcpp algorithm is of order 2000 !!!**
 
 ``` r
 #max gain
 time1/time4
 ```
 
-    ## [1] 2165.429
+    ## [1] 2411.929
 
-<a id="oth"></a>
+<a id="micro"></a>
 
-## Coming soon: other simulations...
+## Microblenchmark
 
-We want to verify the worst case time complexity and/or the average time complexity of these algorithms.
+You need the packages `microbenchmark` and `ggplot2` to run the simulations and plot the results (in violin plots). We compare `insertion_sort_Rcpp` with `heap_sort_Rcpp` for data lengths `n = 1000` and `n = 10000`.
+
+``` r
+library(microbenchmark)
+library(ggplot2)
+n <- 1000
+res <- microbenchmark(one.simu(n, func = "insertion_sort_Rcpp"), one.simu(n, func = "heap_sort_Rcpp"), times = 50)
+autoplot(res)
+```
+
+    ## Coordinate system already present. Adding new coordinate system, which will replace the existing one.
+
+![](README_files/figure-markdown_github/unnamed-chunk-11-1.png)
+
+``` r
+res
+```
+
+    ## Unit: milliseconds
+    ##                                       expr      min       lq     mean   median
+    ##  one.simu(n, func = "insertion_sort_Rcpp") 43.89660 44.72201 45.18743 45.19974
+    ##       one.simu(n, func = "heap_sort_Rcpp") 42.95278 44.29912 45.06825 44.90356
+    ##        uq      max neval cld
+    ##  45.61574 46.66871    50   a
+    ##  45.56159 49.80956    50   a
+
+``` r
+n <- 10000
+res <- microbenchmark(one.simu(n, func = "insertion_sort_Rcpp"), one.simu(n, func = "heap_sort_Rcpp"), times = 50)
+autoplot(res)
+```
+
+    ## Coordinate system already present. Adding new coordinate system, which will replace the existing one.
+
+![](README_files/figure-markdown_github/unnamed-chunk-12-1.png)
+
+``` r
+res
+```
+
+    ## Unit: milliseconds
+    ##                                       expr      min       lq     mean   median
+    ##  one.simu(n, func = "insertion_sort_Rcpp") 136.3762 138.8541 140.5156 139.8834
+    ##       one.simu(n, func = "heap_sort_Rcpp") 109.1030 111.3678 112.9967 112.1167
+    ##      uq      max neval cld
+    ##  142.34 145.8987    50   b
+    ##  114.33 136.2545    50  a
+
+At this data length `10000` we start having a robust difference in running time.
+
+<a id="time"></a>
+
+## Time complexity
+
+We run `nbRep = 50` times the `heap_sort_Rcpp` algorithm of each value of the `vector_n` vector of length `nbSimus = 20`. We show the plot of the mean running time with respect to data length.
+
+``` r
+nbSimus <- 20
+vector_n <- seq(from = 10000, to = 100000, length.out = nbSimus)
+nbRep <- 50
+res_Heap <- data.frame(matrix(0, nbSimus, nbRep + 1))
+colnames(res_Heap) <- c("n", paste0("Rep",1:nbRep))
+
+j <- 1
+for(i in vector_n)
+{
+  res_Heap[j,] <- c(i, replicate(nbRep, one.simu(i, func = "heap_sort_Rcpp")))  
+  #print(j)
+  j <- j + 1
+}
+
+res <- rowMeans(res_Heap[,-1])
+plot(vector_n, res, type = 'b', xlab = "data length", ylab = "mean time in seconds")
+```
+
+![](README_files/figure-markdown_github/unnamed-chunk-13-1.png)
+
+Same strategy but with the `insertion_sort_Rcpp` algorithm. We get the power in complexity model *O*(*n*<sup>*r*</sup>) by fitting a linear model in log scale. The slope coefficient *r* is very close to 2 as expected.
+
+``` r
+nbSimus <- 20
+vector_n <- seq(from = 5000, to = 50000, length.out = nbSimus)
+nbRep <- 50
+res_Insertion <- data.frame(matrix(0, nbSimus, nbRep + 1))
+colnames(res_Insertion) <- c("n", paste0("Rep",1:nbRep))
+
+j <- 1
+for(i in vector_n)
+{
+  res_Insertion[j,] <- c(i, replicate(nbRep, one.simu(i, func = "insertion_sort_Rcpp")))  
+  #print(j)
+  j <- j + 1
+}
+
+res <- rowMeans(res_Insertion[,-1])
+plot(vector_n, res, type = 'b', xlab = "data length", ylab = "mean time in seconds")
+```
+
+![](README_files/figure-markdown_github/unnamed-chunk-14-1.png)
+
+``` r
+lm(log(res) ~ log(vector_n))
+```
+
+    ## 
+    ## Call:
+    ## lm(formula = log(res) ~ log(vector_n))
+    ## 
+    ## Coefficients:
+    ##   (Intercept)  log(vector_n)  
+    ##       -21.148          1.907

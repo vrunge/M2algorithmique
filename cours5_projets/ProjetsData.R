@@ -186,3 +186,6 @@ plot(x,y)
 cor(x,y)
 cor(x,y, method="kendall")
 
+                   
+                   
+# voir aussi : https://en.wikipedia.org/wiki/Anscombe%27s_quartet

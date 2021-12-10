@@ -179,3 +179,10 @@ mean(z)
 
 
 
+# CASE 4 ("fausse" corrélation)
+x <-  c(rnorm(n-1, mean = 10),200)
+y <-  c(rnorm(n-1, mean = 10),200)
+plot(x,y)
+cor(x,y)
+cor(x,y, method="kendall")
+

@@ -10,14 +10,25 @@ Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
 Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
-// tour_superSimple
-NumericVector tour_superSimple(int n);
-RcppExport SEXP _M2algorithmique_tour_superSimple(SEXP nSEXP) {
+// Commerce
+/**   * @title Algorithme Naïf pour le Problème du Voyageur de Commerce(TSP)  *   * @description  * Résout le problème du voyageur de commerce (TSP) en utilisant une approche heuristique naïve  * basée sur l'insertion des villes dans le trajet à chaque étape. Le meilleur trajet est déterminé  * en testant un ou tous les points de départ possibles (option type);
+RcppExport SEXP _M2algorithmique_Commerce(SEXP typeSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< int >::type n(nSEXP);
-    rcpp_result_gen = Rcpp::wrap(tour_superSimple(n));
+    Rcpp::traits::input_parameter< TSP)  *   * @description  * Résout le problème du voyageur de commerce (TSP) en utilisant une approche heuristique naïve  * basée sur l'insertion des villes dans le trajet à chaque étape. Le meilleur trajet est déterminé  * en testant un ou tous les points de départ possibles (option >::type type(typeSEXP);
+    rcpp_result_gen = Rcpp::wrap(Commerce(type));
+    return rcpp_result_gen;
+END_RCPP
+}
+// compute_distances
+NumericMatrix compute_distances(NumericMatrix data);
+RcppExport SEXP _M2algorithmique_compute_distances(SEXP dataSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericMatrix >::type data(dataSEXP);
+    rcpp_result_gen = Rcpp::wrap(compute_distances(data));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -32,35 +43,22 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// build_heap_Rcpp
-NumericVector build_heap_Rcpp(NumericVector heap, unsigned int i, unsigned int n);
-RcppExport SEXP _M2algorithmique_build_heap_Rcpp(SEXP heapSEXP, SEXP iSEXP, SEXP nSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< NumericVector >::type heap(heapSEXP);
-    Rcpp::traits::input_parameter< unsigned int >::type i(iSEXP);
-    Rcpp::traits::input_parameter< unsigned int >::type n(nSEXP);
-    rcpp_result_gen = Rcpp::wrap(build_heap_Rcpp(heap, i, n));
-    return rcpp_result_gen;
-END_RCPP
-}
 // heap_sort_Rcpp
-NumericVector heap_sort_Rcpp(NumericVector v);
+std::vector<double> heap_sort_Rcpp(std::vector<double> v);
 RcppExport SEXP _M2algorithmique_heap_sort_Rcpp(SEXP vSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< NumericVector >::type v(vSEXP);
+    Rcpp::traits::input_parameter< std::vector<double> >::type v(vSEXP);
     rcpp_result_gen = Rcpp::wrap(heap_sort_Rcpp(v));
     return rcpp_result_gen;
 END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_M2algorithmique_tour_superSimple", (DL_FUNC) &_M2algorithmique_tour_superSimple, 1},
+    {"_M2algorithmique_Commerce", (DL_FUNC) &_M2algorithmique_Commerce, 1},
+    {"_M2algorithmique_compute_distances", (DL_FUNC) &_M2algorithmique_compute_distances, 1},
     {"_M2algorithmique_insertion_sort_Rcpp", (DL_FUNC) &_M2algorithmique_insertion_sort_Rcpp, 1},
-    {"_M2algorithmique_build_heap_Rcpp", (DL_FUNC) &_M2algorithmique_build_heap_Rcpp, 3},
     {"_M2algorithmique_heap_sort_Rcpp", (DL_FUNC) &_M2algorithmique_heap_sort_Rcpp, 1},
     {NULL, NULL, 0}
 };

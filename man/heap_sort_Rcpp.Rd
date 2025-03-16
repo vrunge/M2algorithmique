@@ -2,16 +2,42 @@
 % Please edit documentation in R/RcppExports.R
 \name{heap_sort_Rcpp}
 \alias{heap_sort_Rcpp}
-\title{Heap sort algorithm using C++}
+\title{Heap Sort Algorithm (C++ Implementation)}
 \usage{
 heap_sort_Rcpp(v)
 }
 \arguments{
-\item{v}{an unsorted vector of numeric data}
+\item{v}{A numeric vector containing unsorted elements.}
 }
 \value{
-a sorted vector
+A numeric vector sorted in ascending order.
 }
 \description{
-Heap sort algorithm using C++
+This function implements **Heap Sort**, an efficient sorting algorithm that 
+first builds a max-heap and then repeatedly extracts the maximum element to 
+produce a sorted sequence.
+
+The algorithm consists of two main steps:
+\enumerate{
+  \item \bold{Heap Construction:} The input vector is reorganized into a max-heap.
+  \item \bold{Sorting:} The largest element (root) is swapped with the last element, 
+    reducing the heap size and reapplying heapify.
+}
+}
+\details{
+\itemize{
+  \item \bold{Time Complexity:}
+    \itemize{
+      \item Building the heap: O(n)
+      \item Extracting elements: O(n log n)
+      \item Overall: O(n log n)
+    }
+  \item \bold{Space Complexity:} O(1) (in-place sorting).
+  \item \bold{Unstable Sort:} The relative order of equal elements may change.
+}
+}
+\examples{
+heap_sort_Rcpp(rnorm(100))
+heap_sort_Rcpp(sample(100))
+
 }

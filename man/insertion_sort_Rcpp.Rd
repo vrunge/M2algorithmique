@@ -13,7 +13,7 @@ insertion_sort_Rcpp(v)
 A numeric vector of the same length as `v`, sorted in ascending order.
 }
 \description{
-This function implements the **Insertion Sort** algorithm in C++ and is exported to R using Rcpp. 
+This function implements the \bold{Insertion Sort} algorithm in C++ and is exported to R using Rcpp. 
 Insertion Sort is a simple sorting algorithm that builds the sorted sequence one element at a time 
 by inserting each new element into its correct position within the sorted part of the vector.
 
@@ -21,9 +21,11 @@ The algorithm works by iterating through the input vector and shifting larger el
 before inserting the current element (key) into its proper position.
 }
 \details{
-- Time Complexity: **O(n²)** in the worst and average cases, **O(n)** in the best case (already sorted data).
-- Space Complexity: **O(1)** (in-place sorting, no additional memory used).
-- Stable Sorting Algorithm: Maintains the relative order of equal elements.
+\itemize{
+  \item \bold{Time Complexity:} O(n²)in the worst and average cases, O(n) in the best case (already sorted data).
+  \item \bold{Space Complexity:} O(1) (in-place sorting, no additional memory used).
+  \item \bold{Stable Sorting Algorithm:} Maintains the relative order of equal elements.
+}
 }
 \examples{
 insertion_sort_Rcpp(rnorm(100))

@@ -1,13 +1,13 @@
 useDynLib(M2algorithmique, .registration=TRUE)
 
-# Exports sorting algo
+##### Exports sorting algo
 export(insertion_sort)
 export(heap_sort)
 
 export(insertion_sort_Rcpp)
 export(heap_sort_Rcpp)
 
-# Exports TSP algo
+##### Exports TSP algo
 export(TSP_naif)
 export(TSP_cheapest)
 export(TSP_nearest)
@@ -15,7 +15,13 @@ export(TSP_farthest)
 export(TSP_B_and_B)
 
 export(TSP_naif_Rcpp)
+export(TSP_cheapest_Rcpp)
+export(TSP_nearest_Rcpp)
 
+export(plot.TSP)
+export(tour_length)
+
+##### import from PACKAGES
 
 importFrom("grDevices", "colorRamp", "rgb")
 importFrom("graphics", "segments", "title")

@@ -10,14 +10,39 @@ Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
 Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
-// Commerce
-/**   * @title Algorithme Naïf pour le Problème du Voyageur de Commerce(TSP)  *   * @description  * Résout le problème du voyageur de commerce (TSP) en utilisant une approche heuristique naïve  * basée sur l'insertion des villes dans le trajet à chaque étape. Le meilleur trajet est déterminé  * en testant un ou tous les points de départ possibles (option type);
-RcppExport SEXP _M2algorithmique_Commerce(SEXP typeSEXP) {
+// TSP_naif_Rcpp
+IntegerVector TSP_naif_Rcpp(NumericMatrix data, std::string type);
+RcppExport SEXP _M2algorithmique_TSP_naif_Rcpp(SEXP dataSEXP, SEXP typeSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< TSP)  *   * @description  * Résout le problème du voyageur de commerce (TSP) en utilisant une approche heuristique naïve  * basée sur l'insertion des villes dans le trajet à chaque étape. Le meilleur trajet est déterminé  * en testant un ou tous les points de départ possibles (option >::type type(typeSEXP);
-    rcpp_result_gen = Rcpp::wrap(Commerce(type));
+    Rcpp::traits::input_parameter< NumericMatrix >::type data(dataSEXP);
+    Rcpp::traits::input_parameter< std::string >::type type(typeSEXP);
+    rcpp_result_gen = Rcpp::wrap(TSP_naif_Rcpp(data, type));
+    return rcpp_result_gen;
+END_RCPP
+}
+// TSP_cheapest_Rcpp
+IntegerVector TSP_cheapest_Rcpp(NumericMatrix data, std::string type);
+RcppExport SEXP _M2algorithmique_TSP_cheapest_Rcpp(SEXP dataSEXP, SEXP typeSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericMatrix >::type data(dataSEXP);
+    Rcpp::traits::input_parameter< std::string >::type type(typeSEXP);
+    rcpp_result_gen = Rcpp::wrap(TSP_cheapest_Rcpp(data, type));
+    return rcpp_result_gen;
+END_RCPP
+}
+// TSP_nearest_Rcpp
+IntegerVector TSP_nearest_Rcpp(NumericMatrix data, std::string type);
+RcppExport SEXP _M2algorithmique_TSP_nearest_Rcpp(SEXP dataSEXP, SEXP typeSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericMatrix >::type data(dataSEXP);
+    Rcpp::traits::input_parameter< std::string >::type type(typeSEXP);
+    rcpp_result_gen = Rcpp::wrap(TSP_nearest_Rcpp(data, type));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -56,7 +81,9 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_M2algorithmique_Commerce", (DL_FUNC) &_M2algorithmique_Commerce, 1},
+    {"_M2algorithmique_TSP_naif_Rcpp", (DL_FUNC) &_M2algorithmique_TSP_naif_Rcpp, 2},
+    {"_M2algorithmique_TSP_cheapest_Rcpp", (DL_FUNC) &_M2algorithmique_TSP_cheapest_Rcpp, 2},
+    {"_M2algorithmique_TSP_nearest_Rcpp", (DL_FUNC) &_M2algorithmique_TSP_nearest_Rcpp, 2},
     {"_M2algorithmique_compute_distances", (DL_FUNC) &_M2algorithmique_compute_distances, 1},
     {"_M2algorithmique_insertion_sort_Rcpp", (DL_FUNC) &_M2algorithmique_insertion_sort_Rcpp, 1},
     {"_M2algorithmique_heap_sort_Rcpp", (DL_FUNC) &_M2algorithmique_heap_sort_Rcpp, 1},

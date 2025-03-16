@@ -30,16 +30,10 @@
 #' \code{"TSP"}.
 #'
 #' @examples
-#' # Exemple avec un jeu de données fictif représentant des villes sur un plan 2D
-#' coord <- data.frame(x = c(0, 1, 3, 5), y = c(0, 2, 3, 1))
-#'
-#' # Résoudre le problème TSP avec la méthode naïve en partant d'une ville aléatoire
-#' best_tour <- TSP_naif(coord, type = "one")
-#' print(best_tour)
-#'
-#' # Résoudre le problème TSP en testant toutes les villes de départ
-#' best_tour_all <- TSP_naif(coord, type = "all")
-#' print(best_tour_all)
+#' 
+#' n <- 10
+#' villes <- matrix(runif(2*n), n, 2)
+#' TSP_naif(villes, type = "one")
 TSP_naif <- function(data, type = "one")
 {
   n <- nrow(data)  # Nombre de villes

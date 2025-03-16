@@ -1,7 +1,6 @@
 ^.*\.Rproj$
 ^\.Rproj\.user$
 forStudents
-cours1
-cours2
-cours3
-cours4
+Heap_sort_example.gif
+Insertion-sort-example.gif
+README_files

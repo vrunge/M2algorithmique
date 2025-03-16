@@ -1,9 +1,21 @@
 useDynLib(M2algorithmique, .registration=TRUE)
 
+# Exports sorting algo
 export(insertion_sort)
 export(heap_sort)
 export(insertion_sort_Rcpp)
 export(heap_sort_Rcpp)
 
+# Exports TSP algo
+export(TSP_naif)
+export(TSP_cheapest)
+export(TSP_nearest)
+export(TSP_farthest)
+export(TSP_B_and_B)
+
+importFrom("grDevices", "colorRamp", "rgb")
+importFrom("graphics", "segments", "title")
+importFrom("stats", "dist")
+    
 importFrom(Rcpp, evalCpp)
 

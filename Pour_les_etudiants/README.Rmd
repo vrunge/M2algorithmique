@@ -1,0 +1,191 @@
+---
+output: github_document
+---
+
+
+# M2algorithmique Vignette
+### Vincent Runge
+#### LaMME, Evry Paris-Saclay University
+### March 17, 2025
+
+
+> [Package Presentation](#pp)
+
+> [Quick Start](#qs)
+
+> [Examples](#ex)
+
+> [Analysis](#an)
+
+
+___ 
+
+<a id="pp"></a>
+
+## Package Presentation  
+
+The `M2algorithmique` R package is an **example package** designed to help students develop their own R/Rcpp packages as part of the **M2 Algorithmic courses in the Data Science master's program at Université d'Évry Paris-Saclay**.  
+
+This package provides implementations of various algorithmic strategies in both R and Rcpp, including:  
+
+- **Sorting algorithms**: Insertion Sort and Heap Sort  
+- **Shortest path algorithms**: Dijkstra's algorithm with naive, binary heap, and Fibonacci heap implementations  
+- **Travelling Salesman Problem (TSP)**: Exact Branch and Bound algorithm, along with multiple heuristic approaches  
+
+This package serves as a reference for students, demonstrating good practices in algorithm implementation and package development in R.
+
+___ 
+
+<a id="qs"></a>
+
+## Quick Start
+
+### Prerequisites for Package Development
+
+To develop and use the package, install the necessary dependencies:
+
+```{r, eval=FALSE}
+install.packages(c("Rcpp", "RcppArmadillo", "devtools", "roxygen2", "testthat"))
+```
+
+### Installing the Package from GitHub
+
+To install the M2algorithmique package, use:
+
+```{r, eval=FALSE}
+devtools::install_github("vrunge/M2algorithmique")
+```
+
+Then, load the package:
+
+```{r}
+library(M2algorithmique)
+```
+
+### Setting Up a C++ Compiler (Windows Users)
+
+Since Rcpp requires a C++ compiler, Windows users must install Rtools:
+
+Download and install Rtools from:
+https://cran.r-project.org/bin/windows/Rtools/
+For general R updates and additional package downloads, visit the CRAN:
+https://cran.r-project.org/
+
+
+
+### Package Structure  
+
+- **One file = one function**: Each function is stored in a separate file for clarity.  
+- **R and C++ function naming convention**:  
+  - R functions (`fct`) are stored in the `R/` folder.  
+  - Their corresponding C++ versions (`fct_Rcpp`) are in the `src/` folder.  
+- **Documentation**:  
+  - Help files for functions are available via `?fct`.  
+  - Files in the `man/` folder are automatically generated using **Roxygen2**.  
+  - To regenerate documentation when installing the package:  
+    1. Click **Build** → **More** → **Configure Build Tools...**  
+    2. Enable **Generate Documentation with Roxygen**  
+    3. Click **Configure**, then check **Install and Restart**  
+- **Key Package Files**:  
+  - **`DESCRIPTION`**: Modify this file to personalize your package (e.g., email, description).  
+  - **`NAMESPACE`**: Controls function exports. Customize it to expose only desired functions while keeping others internal.  
+  - **`.Rbuildignore`**: Excludes files that are unnecessary for package building (e.g., the `Pour_les_etudiants/` folder).  
+  - **`.gitignore`**: Prevents unnecessary files (e.g., `.o` object files) from being tracked on GitHub.  
+
+___ 
+
+<a id="ex"></a>
+
+## Examples
+
+### Sorting Algorithms (Recursive)
+
+
+```{r}
+n <- 10
+v <- sample(n)
+v
+```
+
+
+We implemeted 4 algorithms: 
+
+- `insertion_sort` 
+- `heap_sort` 
+- `insertion_sort_Rcpp` 
+- `heap_sort_Rcpp` 
+
+They all have a unique argument: the unsorted vector `v`. Examples:
+
+```{r}
+insertion_sort(v)
+heap_sort_Rcpp(v)
+```
+
+
+
+
+### Dijkstra Algorithms (Dynamic Programming)
+
+
+### TSP Algorithms (Heuristic)  
+
+We generate `n = 20` towns (villes) randomly in a **2D plane** using a uniform distribution:  
+```{r}
+n <- 20
+villes <- matrix(runif(2 * n), n, 2)
+```  
+
+#### Visualization of the Towns  
+```{r, echo=FALSE}
+plot(villes[,1], villes[,2], xlim = c(0,1), ylim = c(0,1), xlab = "", ylab = "", asp=1, pty ="s")
+```  
+
+We implemented **four heuristic** algorithms and **one exact** algorithm for solving the **Travelling Salesman Problem (TSP)**:  
+
+- **Heuristic Approaches:**  
+  - `TSP_naif` (Naive approach)  
+  - `TSP_cheapest` (Cheapest insertion heuristic)  
+  - `TSP_nearest` (Nearest neighbor heuristic)  
+  - `TSP_farthest` (Farthest insertion heuristic)  
+
+- **Exact Algorithm:**  
+  - `TSP_B_and_B` (Branch and Bound)  
+
+Each algorithm also has an equivalent **Rcpp implementation** for performance optimization.  
+
+#### Example
+
+```{r, echo=FALSE}
+res1 <- TSP_naif(villes)
+res2 <- TSP_cheapest(villes)
+res3 <- TSP_nearest(villes) 
+res4 <- TSP_farthest(villes)
+t1 <- tour_length(res1, villes)
+t2 <- tour_length(res2, villes)
+t3 <- tour_length(res3, villes)
+t4 <- tour_length(res4, villes)
+par(mfrow=c(2,2),
+    oma = c(5,4,0,0) + 0.1,
+    mar = c(1.5,1.5,1,0) + 0.1)
+plot.TSP(tour = res1, data = villes, main = "naif", value = t1)
+plot.TSP(tour = res2, data = villes, main = "cheapest", value = t2)
+plot.TSP(tour = res3, data = villes, main = "nearest", value = t3)
+plot.TSP(tour = res4, data = villes, main = "farthest", value = t4)
+```
+
+
+___
+
+<a id="an"></a>
+
+## Analysis  
+
+The `Pour_les_etudiants` folder contains the following analysis files:  
+
+- **`Sorting_analyse.Rmd`** – Analysis of sorting algorithms  
+- **`Dijkstra_analyse.Rmd`** – Analysis of Dijkstra’s algorithm  
+- **`TSP_analyse.Rmd`** – Analysis of the Traveling Salesman Problem (TSP)  
+
+<span style="color:red">These documents, written in French, outline the type of analysis students are expected to conduct to validate this course.</span>
+

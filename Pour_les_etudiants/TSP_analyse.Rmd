@@ -1,0 +1,484 @@
+---
+title: | 
+  | Evaluation des algorithmes heuristiques pour le voyageur de commerce
+  | ![](Images/logo_lamme.png){width=1in}  ![](Images/logo_UEVE.png){width=1.7in}
+  |  M2 Data Science Algorithmique 
+author:  "Vincent Runge"
+date: "vendredi 14 mars 2025"
+header-includes:
+  - \usepackage[french]{babel}
+output:
+  pdf_document:
+    keep_tex: yes
+    toc: true
+    number_sections: true  
+  html_document:
+    df_print: paged
+    number_sections: true  
+urlcolor: blue
+---
+
+\noindent\hrulefill
+
+
+# Description du problème et objectif
+
+On tire de manière aléatoire dans le carré unité selon une loi uniforme $\mathcal{U}(0,1) \times \mathcal{U}(0,1)$ un nombre `n` de villes. On donne ici un exemple avec 40 villes :
+
+```{r}
+n <- 40
+villes <- matrix(runif(2*n), n, 2)
+```
+
+
+```{r, echo=FALSE}
+plot(villes[,1], villes[,2], xlim = c(0,1), ylim = c(0,1), xlab = "", ylab = "", asp=1, pty ="s")
+```
+
+Notre premier objectif est de contruire un "plus court chemin" par un **algorithme heuristique**. On comparera différentes **méthodes d'insertion** et on analysera leur **temps de calcul** numériquement. 
+
+**Notre objectif (TP) : **
+
+- comparer les performances en temps des algorithmes
+
+- évaluer la distance à la solution optimale 
+
+- pour cela coder les algorithmes exacts de *branch and bound* et *Held Karp*. 
+
+
+On note $c(i,j)$ le coût pour passer de la ville $i$ à la ville $j$. Notre objectif est de trouver la permutation des indices $(1,...,n)$ notée $(v_1,...,v_n)$ qui minimisera la longueur du tour:
+
+$$\sum_{i=1}^{n}c(v_i,v_{i+1})$$
+avec $v_{n+1} = v_1$. Remarquez bien qu'une permutation contient une et une seule fois chaque indice de sorte que le tour est complet et passe bien par chaque ville une et une seule fois. Le coût  $c(i,j)$ sera dans ce document égal à la distance euclidienne.
+
+
+
+# L'algorithme naïf du plus proche voisin
+
+C'est la méthode la plus simple. Elle consiste à partir d'une ville $i$ et de contruire le chemin de proche en proche en ajoutant en bout de chemin la ville la plus proche parmi les villes non explorées. Quand toutes les villes sont explorées on revient à la première ville pour fermer le tour.
+
+On peut répéter la procédure pour chaque ville de départ (on exécute ainsi $n$ fois cette méthode) pour choisir le meilleur chemin parmi les $n$ obtenus. 
+
+(librairies à installer)
+```{r}
+library(ggplot2) #ggplot
+library(reshape2) #melt
+library(parallel) #mclapply
+```
+
+```{r}
+library(M2algorithmique)
+res1 <- TSP_naif(villes, type = "one")
+```
+
+
+```{r, echo=FALSE}
+plot.TSP(tour = res1, data = villes)
+(t1 <- tour_length(res1, villes))
+cat("Longueur =", t1, "\n")
+```
+
+___ 
+
+**Exercice :** pour le problème euclidien du voyageur de commerce (inégalité triangulaire respectée), le tour optimal ne peut pas contenir de croisement. 
+
+En effet, supposons que le tour contienne un croisement. Cela signifie qu’il existe quatre villes A,B,C,D telles que les arêtes (A,C) et (B,D) se croisent. On échange les arêtes croisées: connecter A à B puis C à D. Cela supprime le croisement.
+
+Si AC et BD se coupent en O. On a :
+
+$$d(A,B) \le d(A,O) + d(O,B) \,,\quad d(C,D) \le d(C,O) + d(O,D) $$
+donc 
+
+$$d(A,B) + d(C,D) \le d(A,O) + d(O,B) + d(C,O) + d(O,D) = d(A,C) + d(B,D)$$
+Dans le tour, $A => C$ et $B => D$ est remplacé par $A => B$ et $C => D$, l'entrée par $A$ et la sortie par $D$ sont respectés. Tout autre permutation des lettres est possible et mène au même résultat
+
+___ 
+
+# Les algorithmes d'insertion
+
+les algorithmes d'insertion consistent à insérer les villes les unes après les autres **dans un tour partiel** (contenant qu'un sous-ensemble des villes) partant d'une ou deux villes de départ.
+
+## L'algorithme d'insertion *cheapest* ("le moins cher")
+
+Pour un tour partiel déjà constitué on cherche l'arrête (le couple de villes) $(i,j)$ et la ville encore non incluse $k$ qui minimise la quantité
+
+$$c(i,k) + c(k,j) - c(i,j)$$
+C'est ainsi l'insertion la moins coûteuse. On pourra aussi répéter l'algorithme pour chacune des villes de départ.
+
+```{r}
+res2 <- TSP_cheapest(villes, type = "one")
+```
+
+
+```{r, echo=FALSE}
+plot.TSP(tour = res2, data = villes)
+(t2 <- tour_length(res2, villes))
+cat("Longueur =", t2, "\n")
+```
+
+
+
+## L'algorithme d'insertion *nearest* ("le plus proche")
+
+Pour un tour partiel déjà constitué on cherche la ville $i$ et la ville encore non incluse $k$ qui minimise la quantité $c(i,k)$ : c'est la ville la plus proche du tour. Une fois trouvée on insert cette ville à sa position optimale en trouvant l'arrête $(i,j)$ qui minimise $c(i,k) + c(k,j) - c(i,j)$
+C'est ainsi l'insertion la plus proche. On pourra aussi répéter l'algorithme pour chacune des villes de départ.
+
+```{r}
+res3 <- TSP_nearest(villes)
+```
+
+```{r, echo=FALSE}
+plot.TSP(tour = res3, data = villes)
+(t3 <- tour_length(res3, villes))
+cat("Longueur =", t3, "\n")
+```
+
+
+
+## L'algorithme d'insertion *farthest* ("le plus éloigné")
+
+Pour un tour partiel déjà constitué on cherche pour chaque ville non encore incluse $k$, la ville $i$ du tour la plus proche. On obtient des distances $c(i,k)$ avec autant de couples $(i,k)$ qu'il y a de villes non incluses. On sélectionne le plus grande de ces distances et la ville $k$ qui lui est associée. On insère cette ville $k$ à sa position optimale selon le critère habituel (min de $c(i,k) + c(k,j) - c(i,j)$). 
+
+
+```{r}
+res4 <- TSP_farthest(villes)
+```
+
+```{r, echo=FALSE}
+plot.TSP(tour = res4, data = villes)
+(t4 <- tour_length(res4, villes))
+cat("Longueur =", t4, "\n")
+```
+
+
+
+Affichés tous ensemble :
+
+```{r, echo=FALSE}
+par(mfrow=c(2,2),
+    oma = c(5,4,0,0) + 0.1,
+    mar = c(1.5,1.5,1,0) + 0.1)
+plot.TSP(tour = res1, data = villes, main = "naif", value = t1)
+plot.TSP(tour = res2, data = villes, main = "cheapest", value = t2)
+plot.TSP(tour = res3, data = villes, main = "nearest", value = t3)
+plot.TSP(tour = res4, data = villes, main = "farthest", value = t4)
+```
+
+Il est possible dans ce cadre eucliden d'obtenir une [bornes sur la longueur du tour](https://www.researchgate.net/publication/220616869_An_Analysis_of_Several_Heuristics_for_the_Traveling_Salesman_Problem). Ces algorithmes heuristiques sont donc des algorithmes d'approximation (sauf peut-être pour *farthest*)!
+
+
+$$algo(cheapest) \le 2 \,algo(opt)$$
+
+$$algo(nearest) \le 2 \,algo(opt)$$
+
+
+$$algo(farthest) \le (\lceil log_2(n) \rceil + 1) \,algo(opt)$$
+
+
+
+# Comparaison des performances 
+
+## Pour les différents algorithmes heuristiques
+
+On répète 100 fois les 4 algorithmes sur des données générées par $\mathcal{U}[0,1] \times \mathcal{U}[0,1]$
+```{r pb1, echo = FALSE, eval=TRUE}
+dist <- data.frame(matrix(0,100,4))
+colnames(dist) <- c("naif", "cheapest", "nearest", "farthest")
+
+for(i in 1:100)
+{
+  n <- 40
+  villes <- matrix(runif(2*n), n, 2)
+  
+  t1 <- tour_length(TSP_naif(villes), villes)
+  t2 <- tour_length(TSP_cheapest(villes), villes)
+  t3 <- tour_length(TSP_nearest(villes), villes)
+  t4 <- tour_length(TSP_farthest(villes), villes)
+  
+  dist[i,] <- c(t1,t2,t3,t4)
+}
+```
+
+```{r,echo = FALSE,  warning=FALSE, fig.width=5, fig.height=3}
+df <- melt(dist)
+ggplot(df, aes(x=variable, y=value)) + geom_violin()
+```
+
+Rang moyen :
+
+```{r, echo=FALSE}
+colMeans(t(apply(dist,1,rank)))
+```
+
+
+## Pour une distribution normale des villes
+
+
+On répète 100 fois les 4 algorithmes sur des données normales générées par $\mathcal{N}(0,1) \times \mathcal{N}(0,1)$
+
+```{r pb2, echo = FALSE, eval=TRUE}
+dist <- data.frame(matrix(0,100,4))
+colnames(dist) <- c("naif", "cheapest", "nearest", "farthest")
+
+for(i in 1:100)
+{
+  n <- 40
+  villes <- matrix(runif(2*n), n, 2)
+  
+  t1 <- tour_length(TSP_naif(villes), villes)
+  t2 <- tour_length(TSP_cheapest(villes), villes)
+  t3 <- tour_length(TSP_nearest(villes), villes)
+  t4 <- tour_length(TSP_farthest(villes), villes)
+  
+  dist[i,] <- c(t1,t2,t3,t4)
+}
+```
+
+
+```{r,echo = FALSE,  warning=FALSE, fig.width=5, fig.height=3}
+df <- melt(dist)
+ggplot(df, aes(x=variable, y=value)) + geom_violin()
+```
+
+Rang moyen :
+
+```{r,echo = FALSE, eval=TRUE}
+colMeans(t(apply(dist,1,rank)))
+```
+
+
+Comment évoluent ces résultats si on répète chaque algorithme pour les $n$ initialisations possibles? Avec la distribution uniforme des villes on obtient: 
+
+```{r pb3, echo = FALSE, eval=TRUE}
+dist <- data.frame(matrix(0,100,4))
+colnames(dist) <- c("naif", "cheapest", "nearest", "farthest")
+
+for(i in 1:100)
+{
+  n <- 40
+  villes <- matrix(runif(2*n), n, 2)
+  
+  t1 <- tour_length(TSP_naif(villes, type = "all"), villes)
+  t2 <- tour_length(TSP_cheapest(villes, type = "all"), villes)
+  t3 <- tour_length(TSP_nearest(villes, type = "all"), villes)
+  t4 <- tour_length(TSP_farthest(villes, type = "all"), villes)
+  
+  dist[i,] <- c(t1,t2,t3,t4)
+}
+```
+
+
+```{r,echo = FALSE,  warning=FALSE, fig.width=5, fig.height=3}
+df <- melt(dist)
+ggplot(df, aes(x=variable, y=value)) + geom_violin()
+```
+
+
+Rang moyen :
+
+```{r, echo=FALSE}
+colMeans(t(apply(dist,1,rank)))
+```
+
+
+# Temps de calcul
+
+On étudie ici le temps la complexité des algorithmes en fonction du nombre $n$ de villes. 
+
+On définit une fonction de type `one.simu` qui simule une seule expérience pour un choix de ville.
+
+```{r}
+one.simu_time_TSP <- function(i, data, algo = "naif", type = "one")
+{
+  if(algo == "naif")
+  {
+    start_time <- Sys.time()
+    TSP_naif(data, type = type)
+    end_time  <- Sys.time()
+  }
+  if(algo == "cheapest")
+  {
+    start_time <- Sys.time()
+    TSP_cheapest(data, type = type)
+    end_time  <- Sys.time()
+  }
+  if(algo == "nearest")
+  {
+    start_time <- Sys.time()
+    TSP_nearest(data, type = type)
+    end_time  <- Sys.time()
+  }
+  if(algo == "farthest")
+  {
+    start_time <- Sys.time()
+    TSP_farthest(data, type = type)
+    end_time  <- Sys.time()
+  }
+  return(unclass(end_time - start_time)[1])
+}
+```
+
+
+On construit un vecteur contenant **des tailles croissante de nombre de villes** selon une échelle logarithmique.
+
+```{r}
+my_n_vector_LOG <- seq(from = log(10), to = log(100), by = log(10)/40)
+my_n_vector <- round(exp(my_n_vector_LOG))
+my_n_vector
+diff(log(my_n_vector))
+```
+
+On voit que `diff(log())` est à peu près constant. Ce n'est pas constant à cause de l'arrondi avec `round`. On construit un data frame qui contiendra les résultats :
+
+```{r}
+p <- 50 ### répétition
+df <- data.frame(matrix( nrow = 4 * length(my_n_vector), ncol = 2 + p))
+colnames(df) <- c("type", "n", 1:p)
+dim(df)
+```
+
+On lance la simulation sur plusieurs coeurs.
+
+```{r pb4}
+nbCores <- 8
+j <- 1
+
+for(n in my_n_vector)
+{
+  #print(n)
+  liste1 <- mclapply(1:p, FUN = one.simu_time_TSP,
+                      data = matrix(runif(2*n), n, 2),
+                     algo = "naif",
+                     mc.cores = nbCores)
+
+  liste2 <- mclapply(1:p, FUN = one.simu_time_TSP,
+                     data = matrix(runif(2*n), n, 2),
+                     algo = "cheapest",
+                     mc.cores = nbCores)
+
+  liste3 <- mclapply(1:p, FUN = one.simu_time_TSP,
+                     data = matrix(runif(2*n), n, 2),
+                     algo = "nearest",
+                     mc.cores = nbCores)
+
+  liste4 <- mclapply(1:p, FUN = one.simu_time_TSP,
+                     data = matrix(runif(2*n), n, 2),
+                     algo = "farthest",
+                     mc.cores = nbCores)
+
+  df[j ,] <- c("naif", n, do.call(cbind, liste1))
+  df[j+1 ,] <- c("cheapest", n, do.call(cbind, liste2))
+  df[j+2 ,] <- c("nearest", n, do.call(cbind, liste3))
+  df[j+3 ,] <- c("farthest", n, do.call(cbind, liste4))
+  j <- j + 4
+}
+
+df <- melt(df, id.vars = c("type","n"))
+```
+
+tranformations techniques : 
+
+```{r pb5}
+data_summary <- function(data, varname, groupnames)
+{
+  require(plyr)
+  summary_func <- function(x, col)
+  {
+    c(mean = mean(x[[col]], na.rm=TRUE),
+      q1 = quantile(x[[col]], 0.025), q3 = quantile(x[[col]], 0.975))
+  }
+  data_sum<-ddply(data, groupnames, .fun=summary_func,
+                  varname)
+  data_sum <- rename(data_sum, c("mean" = varname))
+  return(data_sum)
+}
+
+df2 <- df
+df2[,2] <- as.double(df[,2])
+df2[,3] <- as.double(df[,3])
+df2[,4] <- as.double(df[,4])
+summary(df2)
+
+df_new <- data_summary(df2, varname="value",
+                           groupnames=c("type","n"))
+
+theMin <- min(df_new[,3:5],df_new[,3:5])
+theMax <- max(df_new[,3:5],df_new[,3:5])
+```
+
+
+On trace différentes courbes. 
+
+```{r}
+ggplot(df_new, aes(x = n, y = value, col=type)) +  scale_x_log10()+
+  scale_y_log10(limits = c(theMin, theMax))  +
+  labs(y = "time in seconds") +  labs(x = "number of cites") +
+  geom_point(size = 2, aes(shape = type)) +
+  geom_errorbar(aes(ymin=`q1.2.5%`, ymax=`q3.97.5%`), width=.01) +
+  scale_colour_manual(values = c("cheapest" = "#0080FF",
+                                 "farthest" = " dark blue", "nearest" = "blue", "naif" = "red")) +
+  theme(axis.text.x = element_text(size=15),
+        axis.text.y = element_text(size=15),
+        legend.text=element_text(size=15),
+        axis.title.x=element_text(size=15),
+        axis.title.y=element_text(size=15),
+        legend.position = c(0.7, 0.1),
+        legend.title = element_blank())
+```
+
+
+On calcule les valeurs des coefficients directeurs.
+
+**Pour naif :**
+
+```{r, echo=FALSE}
+R1 <- df_new[df_new$type == "naif",c(2,3)]
+l1 <- lm(log(value) ~ log(n), data = R1, )
+l1$coefficients
+```
+
+**Pour cheapest :**
+
+```{r, echo=FALSE}
+R2 <- df_new[df_new$type == "cheapest",c(2,3)]
+l2 <- lm(log(value) ~ log(n), data = R2, )
+l2$coefficients
+```
+
+**Pour nearest :**
+
+```{r, echo=FALSE}
+R3 <- df_new[df_new$type == "nearest",c(2,3)]
+l3 <- lm(log(value) ~ log(n), data = R3, )
+l3$coefficients
+```
+ 
+ 
+**Pour farthest : **
+
+```{r, echo=FALSE}
+R4 <- df_new[df_new$type == "farthest",c(2,3)]
+l4 <- lm(log(value) ~ log(n), data = R4, )
+l4$coefficients
+```
+
+
+
+# Algorithme *Branch and Bound* and Programmation Dynamique
+
+- Ajouter la fonction `B_and_B`
+
+- Ajouter la fonction  `Held_Karp` (programmation dynamique)
+
+- Evaluer le coefficient d'approximation des méthodes dans le cas d'une répartition uniforme et normale des villes
+
+
+# Amélioration de tour par 2-opt et 3-opt
+
+**EXERCIC Bonus :**
+
+- Ajouter les fonctions `opt2` et `opt3` à coder
+
+- Evaluer l'amélioration apportée en terme de distance
+
+

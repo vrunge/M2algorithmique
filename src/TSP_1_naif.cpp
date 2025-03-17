@@ -77,8 +77,6 @@ IntegerVector TSP_naif_Rcpp(NumericMatrix data, std::string type = "one")
       if (i != start) {to_visit.insert(i);} // Insert all cities except the start city
     }
     
-    
-    
     // Assuming distances is a NumericMatrix and tour, to_visit are properly initialized
     
     for (int i = 1; i < n; i++) // Start from the second city in the tour (index 1 in C++)

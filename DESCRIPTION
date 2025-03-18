@@ -9,5 +9,10 @@ Description: This package provides implementations of various algorithms, includ
 License: GPL-3
 Encoding: UTF-8
 Imports: Rcpp (>= 1.0.5)
+Suggests: 
+    devtools,
+    testthat (>= 3.0.0),
+    rmarkdown,
+    ggplot2
 LinkingTo: Rcpp
 RoxygenNote: 7.3.2

@@ -4,7 +4,7 @@ title: |
   | ![](Images/logo_lamme.png){width=1in}  ![](Images/logo_UEVE.png){width=1.7in}
   |  M2 Data Science Algorithmique 
 author:  "Vincent Runge"
-date: "lundi 147mars 2025"
+date: "lundi 17 mars 2025"
 header-includes:
   - \usepackage[french]{babel}
 output:
@@ -22,7 +22,6 @@ urlcolor: blue
 
 
 # Description du problème et objectif
-
 
 Insertion sort is of time complexity **$O(n^2)$** as heap sort is **$O(n\log(n))$** (worst case complexity). We aim at highlighting two important features with this package:
 

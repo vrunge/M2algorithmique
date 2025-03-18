@@ -116,7 +116,7 @@
 \includegraphics[width=1.7in,height=\textheight]{Images/logo_UEVE.png}\\
 \strut ~M2 Data Science Algorithmique}
 \author{Vincent Runge}
-\date{lundi 147mars 2025}
+\date{lundi 17 mars 2025}
 
 \begin{document}
 \maketitle
@@ -202,7 +202,7 @@ They all have a unique argument: the unsorted vector \texttt{v}.
 \end{Shaded}
 
 \begin{verbatim}
-##  [1]  4  1  5  6  8  2  9  3  7 10
+##  [1]  7  5  9  3  6 10  4  2  1  8
 \end{verbatim}
 
 \begin{Shaded}
@@ -260,7 +260,7 @@ and we get:
 \end{Shaded}
 
 \begin{verbatim}
-## [1] 1.814
+## [1] 1.821
 \end{verbatim}
 
 \begin{Shaded}
@@ -270,7 +270,7 @@ and we get:
 \end{Shaded}
 
 \begin{verbatim}
-## [1] 0.578
+## [1] 0.608
 \end{verbatim}
 
 \begin{Shaded}
@@ -320,7 +320,7 @@ times)
 \end{Shaded}
 
 \begin{verbatim}
-## [1] 205.191
+## [1] 203.8791
 \end{verbatim}
 
 \begin{Shaded}
@@ -330,7 +330,7 @@ times)
 \end{Shaded}
 
 \begin{verbatim}
-## [1] 591.8889
+## [1] 678.875
 \end{verbatim}
 
 \textbf{With the data length of \texttt{10000}, heap\_sort runs 10 to 20
@@ -344,7 +344,7 @@ times faster than insert\_sort.}
 \end{Shaded}
 
 \begin{verbatim}
-## [1] 3.428196
+## [1] 3.41613
 \end{verbatim}
 
 \begin{Shaded}
@@ -354,7 +354,7 @@ times faster than insert\_sort.}
 \end{Shaded}
 
 \begin{verbatim}
-## [1] 9.888889
+## [1] 11.375
 \end{verbatim}
 
 \textbf{The gain between the slow insertsort R algorithm and the faster
@@ -368,7 +368,7 @@ heapsort Rcpp algorithm is of order 2000 !!!}
 \end{Shaded}
 
 \begin{verbatim}
-## [1] 2029.111
+## [1] 2319.125
 \end{verbatim}
 
 \subsection{Microblenchmark}\label{microblenchmark}
@@ -399,7 +399,7 @@ lengths \texttt{n\ =\ 1000} and \texttt{n\ =\ 10000}.
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{Sorting_analyse_files/figure-latex/unnamed-chunk-11-1.pdf}
+\includegraphics{1_Sorting_analyse_files/figure-latex/unnamed-chunk-11-1.pdf}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -410,11 +410,11 @@ lengths \texttt{n\ =\ 1000} and \texttt{n\ =\ 10000}.
 \begin{verbatim}
 ## Unit: milliseconds
 ##                                       expr      min       lq     mean   median
-##  one.simu(n, func = "insertion_sort_Rcpp") 27.66426 28.35995 29.26405 28.92251
-##       one.simu(n, func = "heap_sort_Rcpp") 27.59833 28.50381 30.06691 28.81324
+##  one.simu(n, func = "insertion_sort_Rcpp") 27.96967 28.32075 28.94554 28.49625
+##       one.simu(n, func = "heap_sort_Rcpp") 27.96479 28.30283 28.86995 28.55609
 ##        uq      max neval
-##  29.63193 37.37367    50
-##  30.45259 66.95878    50
+##  29.10926 34.54057    50
+##  28.97987 33.29491    50
 \end{verbatim}
 
 \begin{Shaded}
@@ -425,7 +425,7 @@ lengths \texttt{n\ =\ 1000} and \texttt{n\ =\ 10000}.
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{Sorting_analyse_files/figure-latex/unnamed-chunk-12-1.pdf}
+\includegraphics{1_Sorting_analyse_files/figure-latex/unnamed-chunk-12-1.pdf}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -436,11 +436,11 @@ lengths \texttt{n\ =\ 1000} and \texttt{n\ =\ 10000}.
 \begin{verbatim}
 ## Unit: milliseconds
 ##                                       expr      min       lq     mean   median
-##  one.simu(n, func = "insertion_sort_Rcpp") 43.15307 44.39812 45.24246 44.95921
-##       one.simu(n, func = "heap_sort_Rcpp") 35.17328 36.23912 37.06813 36.69740
+##  one.simu(n, func = "insertion_sort_Rcpp") 42.97636 43.95380 47.68060 45.55670
+##       one.simu(n, func = "heap_sort_Rcpp") 34.73479 35.73892 39.38135 36.70509
 ##        uq      max neval
-##  45.99027 48.52756    50
-##  37.79249 40.49016    50
+##  48.18328 67.58534    50
+##  39.43081 65.79742    50
 \end{verbatim}
 
 At this data length \texttt{10000} we start having a robust difference
@@ -474,7 +474,7 @@ respect to data length.
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{Sorting_analyse_files/figure-latex/unnamed-chunk-13-1.pdf}
+\includegraphics{1_Sorting_analyse_files/figure-latex/unnamed-chunk-13-1.pdf}
 
 Same strategy but with the \texttt{insertion\_sort\_Rcpp} algorithm. We
 get the power in complexity model \(O(n^r)\) by fitting a linear model
@@ -502,7 +502,7 @@ expected.
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{Sorting_analyse_files/figure-latex/unnamed-chunk-14-1.pdf}
+\includegraphics{1_Sorting_analyse_files/figure-latex/unnamed-chunk-14-1.pdf}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -517,7 +517,7 @@ expected.
 ## 
 ## Coefficients:
 ##   (Intercept)  log(vector_n)  
-##       -23.311          2.022
+##       -23.417          2.033
 \end{verbatim}
 
 \end{document}

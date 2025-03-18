@@ -21,8 +21,8 @@
 
 ## Package Presentation
 
-The `M2algorithmique` R package is an **example package** designed to
-help students develop their own R/Rcpp packages as part of the **M2
+The `M2algorithmique` R/Rcpp package is an **example package** designed
+to help students develop their own R/Rcpp packages as part of the **M2
 Algorithmic courses in the Data Science master’s program at Université
 d’Évry Paris-Saclay**.
 
@@ -36,7 +36,7 @@ in both R and Rcpp, including:
   algorithm, along with multiple heuristic approaches
 
 This package serves as a reference for students, demonstrating good
-practices in algorithm implementation and package development in R.
+practices in algorithm implementation and package development in Rcpp.
 
 ------------------------------------------------------------------------
 
@@ -71,27 +71,40 @@ library(M2algorithmique)
 Since Rcpp requires a C++ compiler, Windows users must install Rtools:
 
 Download and install Rtools from:
-<https://cran.r-project.org/bin/windows/Rtools/> For general R updates
-and additional package downloads, visit the CRAN:
+<https://cran.r-project.org/bin/windows/Rtools/>
+
+For general R updates and additional package downloads, visit the CRAN:
 <https://cran.r-project.org/>
 
 ### Package Structure
 
 - **One file = one function**: Each function is stored in a separate
-  file for clarity.  
+  file for clarity.
+
 - **R and C++ function naming convention**:
+
   - R functions (`fct`) are stored in the `R/` folder.  
   - Their corresponding C++ versions (`fct_Rcpp`) are in the `src/`
     folder.  
+  - A **header file** (`.h`) can be used to define functions that are
+    accessible across multiple C++ files. In this package, we use for
+    example **`TSP_auxiliary.h`** to make the distance function globally
+    available to all C++ implementations of heuristic TSP algorithms. To
+    use this function in a C++ file, you need to include the header at
+    the beginning of the file: `#include "TSP_auxiliary.h"`.
+
 - **Documentation**:
+
   - Help files for functions are available via `?fct`.  
   - Files in the `man/` folder are automatically generated using
     **Roxygen2**.  
   - To regenerate documentation when installing the package:
     1.  Click **Build** → **More** → **Configure Build Tools…**  
     2.  Enable **Generate Documentation with Roxygen**  
-    3.  Click **Configure**, then check **Install and Restart**  
+    3.  Click **Configure**, then check **Install and Restart**
+
 - **Key Package Files**:
+
   - **`DESCRIPTION`**: Modify this file to personalize your package
     (e.g., email, description).  
   - **`NAMESPACE`**: Controls function exports. Customize it to expose
@@ -100,6 +113,14 @@ and additional package downloads, visit the CRAN:
     building (e.g., the `Pour_les_etudiants/` folder).  
   - **`.gitignore`**: Prevents unnecessary files (e.g., `.o` object
     files) from being tracked on GitHub.
+
+- **Unit tests**. `tests/` folder and `testthat` integration:
+
+  - Unit tests are stored in the `tests/testthat/` folder.  
+  - The package uses `testthat` to automate testing and ensure functions
+    work correctly.  
+  - To avoid warnings during `R CMD check`, `testthat` should be listed
+    under **Suggests** in `DESCRIPTION`.
 
 ------------------------------------------------------------------------
 
@@ -115,7 +136,7 @@ v <- sample(n)
 v
 ```
 
-    ##  [1]  1  4  6  8  5 10  7  3  9  2
+    ##  [1] 10  7  3  2  1  6  8  5  4  9
 
 We implemeted 4 algorithms:
 
@@ -152,7 +173,7 @@ villes <- matrix(runif(2 * n), n, 2)
 
 #### Visualization of the Towns
 
-![](README_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
+![](Pour_les_etudiants/README_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
 
 We implemented **four heuristic** algorithms and **one exact** algorithm
 for solving the **Travelling Salesman Problem (TSP)**:

@@ -8,7 +8,7 @@
 #' The algorithm uses a simple insertion method to construct a tour by adding cities one by one, minimizing the distance at each step (greedy strategy).
 #'
 #' The algorithm starts from a specified city and iteratively adds the nearest non-visited city to the tour, updating the tour until all cities are visited. 
-#' In "all" mode, the best tour is selected by testing all possible starting cities and computing the total distance for each tour.
+#' In \code{"all"} mode, the best tour is selected by testing all possible starting cities and computing the total distance for each tour.
 #'
 #' @param data A numeric matrix or data frame where each row represents a city and each column represents the coordinates of that city (e.g., x and y coordinates in 2D space).
 #' @param type A character string specifying how the starting city is chosen. Options include:
@@ -39,11 +39,11 @@ TSP_naif_Rcpp <- function(data, type = "one") {
 #' TSP Cheapest Insertion Algorithm (C++ Implementation)
 #'
 #' @description
-#' This function implements the **Cheapest Insertion** heuristic approach for solving the \bold{Traveling Salesman Problem (TSP)} in C++ and is exported to R using Rcpp. 
+#' This function implements the \bold{Cheapest Insertion} heuristic approach for solving the \bold{Traveling Salesman Problem (TSP)} in C++ and is exported to R using Rcpp. 
 #' The algorithm builds the tour by inserting cities into the existing tour in the position that minimizes the increase in tour length.
 #'
 #' The algorithm starts from a specified city and iteratively inserts cities one by one, choosing the insertion position that results in the cheapest (minimum) increase in the total distance at each step. 
-#' In "all" mode, the best tour is selected by testing all possible starting cities and computing the total distance for each tour.
+#' In \code{"all"} mode, the best tour is selected by testing all possible starting cities and computing the total distance for each tour.
 #'
 #' @param data A numeric matrix or data frame where each row represents a city and each column represents the coordinates of that city (e.g., x and y coordinates in 2D space).
 #' @param type A character string specifying how the starting city is chosen. Options include:
@@ -126,7 +126,7 @@ compute_distances <- function(data) {
 #'
 #' @details
 #'  \itemize{
-#'   \item \bold{Time Complexity:} O(n²)in the worst and average cases, O(n) in the best case (already sorted data).
+#'   \item \bold{Time Complexity:} O(n²) in the worst and average cases, O(n) in the best case (already sorted data).
 #'   \item \bold{Space Complexity:} O(1) (in-place sorting, no additional memory used).
 #'   \item \bold{Stable Sorting Algorithm:} Maintains the relative order of equal elements.
 #' }
@@ -142,7 +142,7 @@ insertion_sort_Rcpp <- function(v) {
 #' Maintains the heap property by sifting down an element
 #'
 #' @description
-#' This function ensures the **max-heap property** in a given numeric vector. 
+#' This function ensures the \bold{max-heap property} in a given numeric vector. 
 #' It is used internally by heap sort to reorganize the vector into a valid max-heap.
 #'
 #' @param heap A numeric vector representing a heap.
@@ -157,7 +157,7 @@ NULL
 #' Heap Sort Algorithm (C++ Implementation)
 #'
 #' @description
-#' This function implements **Heap Sort**, an efficient sorting algorithm that 
+#' This function implements \bold{Heap Sort}, an efficient sorting algorithm that 
 #' first builds a max-heap and then repeatedly extracts the maximum element to 
 #' produce a sorted sequence.
 #'

@@ -7,7 +7,7 @@ using namespace Rcpp;
 //' Maintains the heap property by sifting down an element
 //'
 //' @description
-//' This function ensures the **max-heap property** in a given numeric vector. 
+//' This function ensures the \bold{max-heap property} in a given numeric vector. 
 //' It is used internally by heap sort to reorganize the vector into a valid max-heap.
 //'
 //' @param heap A numeric vector representing a heap.
@@ -47,7 +47,7 @@ void heapify(std::vector<double>& heap, size_t i, size_t n)
 //' Heap Sort Algorithm (C++ Implementation)
 //'
 //' @description
-//' This function implements **Heap Sort**, an efficient sorting algorithm that 
+//' This function implements \bold{Heap Sort}, an efficient sorting algorithm that 
 //' first builds a max-heap and then repeatedly extracts the maximum element to 
 //' produce a sorted sequence.
 //'

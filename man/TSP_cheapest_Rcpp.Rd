@@ -19,11 +19,11 @@ TSP_cheapest_Rcpp(data, type = "one")
 A numeric vector representing the order of cities in the shortest found tour. The vector is assigned the class "TSP".
 }
 \description{
-This function implements the **Cheapest Insertion** heuristic approach for solving the \bold{Traveling Salesman Problem (TSP)} in C++ and is exported to R using Rcpp. 
+This function implements the \bold{Cheapest Insertion} heuristic approach for solving the \bold{Traveling Salesman Problem (TSP)} in C++ and is exported to R using Rcpp. 
 The algorithm builds the tour by inserting cities into the existing tour in the position that minimizes the increase in tour length.
 
 The algorithm starts from a specified city and iteratively inserts cities one by one, choosing the insertion position that results in the cheapest (minimum) increase in the total distance at each step. 
-In "all" mode, the best tour is selected by testing all possible starting cities and computing the total distance for each tour.
+In \code{"all"} mode, the best tour is selected by testing all possible starting cities and computing the total distance for each tour.
 }
 \details{
 The algorithm is a heuristic approach and does not guarantee the global optimal solution, but aims to find a good solution in a reasonable amount of time.

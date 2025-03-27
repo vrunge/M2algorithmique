@@ -12,7 +12,7 @@ using namespace Rcpp;
 //' The algorithm uses a simple insertion method to construct a tour by adding cities one by one, minimizing the distance at each step (greedy strategy).
 //'
 //' The algorithm starts from a specified city and iteratively adds the nearest non-visited city to the tour, updating the tour until all cities are visited. 
-//' In "all" mode, the best tour is selected by testing all possible starting cities and computing the total distance for each tour.
+//' In \code{"all"} mode, the best tour is selected by testing all possible starting cities and computing the total distance for each tour.
 //'
 //' @param data A numeric matrix or data frame where each row represents a city and each column represents the coordinates of that city (e.g., x and y coordinates in 2D space).
 //' @param type A character string specifying how the starting city is chosen. Options include:

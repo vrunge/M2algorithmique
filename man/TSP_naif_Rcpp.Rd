@@ -23,7 +23,7 @@ This function implements a naive heuristic approach for solving the \bold{Travel
 The algorithm uses a simple insertion method to construct a tour by adding cities one by one, minimizing the distance at each step (greedy strategy).
 
 The algorithm starts from a specified city and iteratively adds the nearest non-visited city to the tour, updating the tour until all cities are visited. 
-In "all" mode, the best tour is selected by testing all possible starting cities and computing the total distance for each tour.
+In \code{"all"} mode, the best tour is selected by testing all possible starting cities and computing the total distance for each tour.
 }
 \details{
 The algorithm is a heuristic approach and does not guarantee the global optimal solution, but aims to find a good solution in a reasonable amount of time.

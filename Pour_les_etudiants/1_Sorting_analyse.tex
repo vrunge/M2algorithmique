@@ -111,12 +111,12 @@
   urlcolor={blue},
   pdfcreator={LaTeX via pandoc}}
 
-\title{Analyse des algorithmes de tri\\
+\title{Analyse de deux algorithmes de tri par comparaison\\
 \includegraphics[width=1in,height=\textheight]{Images/logo_lamme.png}
 \includegraphics[width=1.7in,height=\textheight]{Images/logo_UEVE.png}\\
 \strut ~M2 Data Science Algorithmique}
 \author{Vincent Runge}
-\date{lundi 17 mars 2025}
+\date{jeudi 27 mars 2025}
 
 \begin{document}
 \maketitle
@@ -131,55 +131,97 @@
 \section{Description du problème et
 objectif}\label{description-du-probluxe8me-et-objectif}
 
-Insertion sort is of time complexity \textbf{\(O(n^2)\)} as heap sort is
-\textbf{\(O(n\log(n))\)} (worst case complexity). We aim at highlighting
-two important features with this package:
+Nous étudions dans ce document le problème très classique du tri des
+éléments d'un vecteur. Ce problème consiste à trier par ordre croissant
+les éléments d'un vecteur initialement non-trié.
+
+Il est intéressant de remarquer que de nombreuses méthodes
+algorithmiques répondent à ce problème. Elles se distinguent par leur
+temps d'exécution et par la mémoire nécessaire à résoudre la tâche. La
+question centrale est ici celle du temps d'exécution.
+
+\href{https://fr.wikipedia.org/wiki/Algorithme_de_tri}{La page wikipédia
+du tri} rassemble de nombreux algorithmes de tri avec leurs avantages et
+inconvénients respectifs. La complexité du problème de tri (par
+comparaison) est de \(O(n \log n)\) pour un vecteur de longueur \(n\).
+Cela signifie que, théoriquement, aucun algorithme ne pourra jamais être
+plus rapide que cette borne asymptotique. Le \emph{radix sort} et
+quelques autres algorithmes sont en temps \(O(n)\) mais demandent des
+hypothèses supplémentaires sur les données (ce n'est plus un tri par
+comparaison).
+
+Dans ce document, nous concentrons notre attention sur deux algorithmes
+de tri:
 
 \begin{enumerate}
-\def\labelenumi{\arabic{enumi}.}
-\tightlist
+\def\labelenumi{\arabic{enumi})}
 \item
-  Rcpp algorithms are \textbf{much more efficient} than their R
-  counterpart
+  le tri par insertion, de complexité \textbf{\(O(n^2)\)}
 \item
-  Time complexities \textbf{can be compared to} one another
+  le tri par tas (\emph{heap sort}), de complexité
+  \textbf{\(O(n \log(n))\)}. Des détails sur le
+  \href{https://en.wikipedia.org/wiki/Heapsort}{tri par tas} sont donnés
+  dans le lien, en particulier les animations donnent une bonne idée du
+  fonctionnement d'un tas.
 \end{enumerate}
 
-\emph{All the simulations presented in this README file are available in
-the \texttt{myTests.R} file in the forStudents folder which also
-contains the Rmd file generating this README.md.}
+Nous avons donc ici deux méthodes l'une naïve, l'autre plus évoluée. Nos
+objectifs sont alors:
 
-Details on the heapsort algorithm can be found on
-\href{https://en.wikipedia.org/wiki/Heapsort}{its wikipedia page}. This
-gif provides a graphical representation of its mechanisms.
+\begin{enumerate}
+\def\labelenumi{\alph{enumi})}
+\item
+  d'implémenter ces algorithmes en R et en C++ et évaluer le gain de
+  temps;
+\item
+  de confirmer les complexités théoriques trouvées sur le papier (ce
+  n'est pas fait dans ce document mais a été fait dans le cours) par des
+  simulations intensives.
+\end{enumerate}
 
-\subsubsection{Package installation}\label{package-installation}
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
 
-You first need to install the \texttt{devtools} package, it can be done
-easily from Rstudio. We install the package from Github (remove the \#
-sign):
+À noter que le (b) se termine toujours par l'évaluation d'une pente sur
+une régression linéaire en échelle log-log. Cela donne une évaluation de
+la valeur \(x\) dans la complexité de type \(O(n^x)\) ou
+\(O(n^x \log^y(n))\).
+
+Nous allons ajouter une étape en plus. En effet, l'évaluation de la
+complexité se fait sur des données simulées, issues d'une certaine
+distribution de probabilité. Nous souhaitons étudier le temps
+d'exécution dans un cas plus favorable à l'algorithme d'insertion.
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\section{Un premier exemple}\label{un-premier-exemple}
+
+Le package se télécharge ainsi :
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\CommentTok{\#devtools::install\_github("vrunge/M2algorithmique")}
+\NormalTok{devtools}\SpecialCharTok{::}\FunctionTok{install\_github}\NormalTok{(}\StringTok{"vrunge/M2algorithmique"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+et ses fonctions sont rendues disponibles sur Rstudio ainsi :
+
+\begin{Shaded}
+\begin{Highlighting}[]
 \FunctionTok{library}\NormalTok{(M2algorithmique)}
 \end{Highlighting}
 \end{Shaded}
 
-\subsubsection{A first simple test}\label{a-first-simple-test}
-
-We simulate simple data as follows, with \texttt{v} a vector as size
-\texttt{n} containing all the integers from \texttt{1} to \texttt{n}
-(exactly one time) in any order.
+On simule un petit exemple d'un vecteur \texttt{v} de taille
+\texttt{100}
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{n }\OtherTok{\textless{}{-}} \DecValTok{10}
+\NormalTok{n }\OtherTok{\textless{}{-}} \DecValTok{100}
 \NormalTok{v }\OtherTok{\textless{}{-}} \FunctionTok{sample}\NormalTok{(n)}
 \end{Highlighting}
 \end{Shaded}
 
-We've implemeted 4 algorithms:
+On teste les 4 algorithmes implémentés avec des noms explicites :
 
 \begin{itemize}
 \tightlist
@@ -193,7 +235,7 @@ We've implemeted 4 algorithms:
   \texttt{heap\_sort\_Rcpp}
 \end{itemize}
 
-They all have a unique argument: the unsorted vector \texttt{v}.
+Cela donne :
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -202,7 +244,12 @@ They all have a unique argument: the unsorted vector \texttt{v}.
 \end{Shaded}
 
 \begin{verbatim}
-##  [1]  7  5  9  3  6 10  4  2  1  8
+##   [1]  35  57  87  14  50  51  61  44  86   1  79  72  91  83  73  48  19   2
+##  [19]  36  54   5  93  99  16  65  90  27   7  37  18  97  10  21  13  38  26
+##  [37]  84  15  31  30  74  80  55  25  71  41  29  12  49  56  63  40  45  62
+##  [55]  81  60   3  53   4  89  67  58  11  32 100  69  33  82  94  20  52  92
+##  [73]  42  23  22  47  85  28  66  96   6  24  34  95  70  76  68  88  46   9
+##  [91]  59  39  77  75  17  78   8  64  43  98
 \end{verbatim}
 
 \begin{Shaded}
@@ -212,25 +259,72 @@ They all have a unique argument: the unsorted vector \texttt{v}.
 \end{Shaded}
 
 \begin{verbatim}
-##  [1]  1  2  3  4  5  6  7  8  9 10
+##   [1]   1   2   3   4   5   6   7   8   9  10  11  12  13  14  15  16  17  18
+##  [19]  19  20  21  22  23  24  25  26  27  28  29  30  31  32  33  34  35  36
+##  [37]  37  38  39  40  41  42  43  44  45  46  47  48  49  50  51  52  53  54
+##  [55]  55  56  57  58  59  60  61  62  63  64  65  66  67  68  69  70  71  72
+##  [73]  73  74  75  76  77  78  79  80  81  82  83  84  85  86  87  88  89  90
+##  [91]  91  92  93  94  95  96  97  98  99 100
 \end{verbatim}
-
-\texttt{insertion\_sort(v)} returns the sorted vector from \texttt{v}.
-
-\subsection{The 4 algorithms at fixed data
-length}\label{the-4-algorithms-at-fixed-data-length}
-
-We run all the following examples at fixed vector length
-\texttt{n\ =\ 10000}.
-
-\subsubsection{One simulation}\label{one-simulation}
-
-We define a function \texttt{one.simu} to simplify the simulation study
-for time complexity.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{one.simu }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{(n, }\AttributeTok{type =} \StringTok{"sample"}\NormalTok{, }\AttributeTok{func =} \StringTok{"insertion\_sort"}\NormalTok{)}
+\FunctionTok{heap\_sort}\NormalTok{(v)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##   [1]   1   2   3   4   5   6   7   8   9  10  11  12  13  14  15  16  17  18
+##  [19]  19  20  21  22  23  24  25  26  27  28  29  30  31  32  33  34  35  36
+##  [37]  37  38  39  40  41  42  43  44  45  46  47  48  49  50  51  52  53  54
+##  [55]  55  56  57  58  59  60  61  62  63  64  65  66  67  68  69  70  71  72
+##  [73]  73  74  75  76  77  78  79  80  81  82  83  84  85  86  87  88  89  90
+##  [91]  91  92  93  94  95  96  97  98  99 100
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{insertion\_sort\_Rcpp}\NormalTok{(v)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##   [1]   1   2   3   4   5   6   7   8   9  10  11  12  13  14  15  16  17  18
+##  [19]  19  20  21  22  23  24  25  26  27  28  29  30  31  32  33  34  35  36
+##  [37]  37  38  39  40  41  42  43  44  45  46  47  48  49  50  51  52  53  54
+##  [55]  55  56  57  58  59  60  61  62  63  64  65  66  67  68  69  70  71  72
+##  [73]  73  74  75  76  77  78  79  80  81  82  83  84  85  86  87  88  89  90
+##  [91]  91  92  93  94  95  96  97  98  99 100
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{heap\_sort\_Rcpp}\NormalTok{(v)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##   [1]   1   2   3   4   5   6   7   8   9  10  11  12  13  14  15  16  17  18
+##  [19]  19  20  21  22  23  24  25  26  27  28  29  30  31  32  33  34  35  36
+##  [37]  37  38  39  40  41  42  43  44  45  46  47  48  49  50  51  52  53  54
+##  [55]  55  56  57  58  59  60  61  62  63  64  65  66  67  68  69  70  71  72
+##  [73]  73  74  75  76  77  78  79  80  81  82  83  84  85  86  87  88  89  90
+##  [91]  91  92  93  94  95  96  97  98  99 100
+\end{verbatim}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\section{Comparaison R avec C++}\label{comparaison-r-avec-c}
+
+On va faire des comparaisons pour les deux types d'algorithme en R et
+C++ pour quantifier leur différence de performance.
+
+La fonction \texttt{one.simu.time} retourne le temps recherché, et
+\texttt{one.simu} sera utilisé par \texttt{microbenchmark}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{one.simu.time }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{(n, }\AttributeTok{type =} \StringTok{"sample"}\NormalTok{, }\AttributeTok{func =} \StringTok{"insertion\_sort"}\NormalTok{)}
 \NormalTok{\{}
   \ControlFlowTok{if}\NormalTok{(type }\SpecialCharTok{==} \StringTok{"sample"}\NormalTok{)\{v }\OtherTok{\textless{}{-}} \FunctionTok{sample}\NormalTok{(n)\}}\ControlFlowTok{else}\NormalTok{\{v }\OtherTok{\textless{}{-}}\NormalTok{ n}\SpecialCharTok{:}\DecValTok{1}\NormalTok{\}}
   \ControlFlowTok{if}\NormalTok{(func }\SpecialCharTok{==} \StringTok{"insertion\_sort"}\NormalTok{)\{t }\OtherTok{\textless{}{-}} \FunctionTok{system.time}\NormalTok{(}\FunctionTok{insertion\_sort}\NormalTok{(v))[[}\DecValTok{1}\NormalTok{]]\}}
@@ -239,43 +333,46 @@ for time complexity.
   \ControlFlowTok{if}\NormalTok{(func }\SpecialCharTok{==} \StringTok{"heap\_sort\_Rcpp"}\NormalTok{)\{t }\OtherTok{\textless{}{-}} \FunctionTok{system.time}\NormalTok{(}\FunctionTok{heap\_sort\_Rcpp}\NormalTok{(v))[[}\DecValTok{1}\NormalTok{]]\}}
   \FunctionTok{return}\NormalTok{(t)}
 \NormalTok{\}}
+
+\NormalTok{one.simu }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{(n, }\AttributeTok{type =} \StringTok{"sample"}\NormalTok{, }\AttributeTok{func =} \StringTok{"insertion\_sort"}\NormalTok{)}
+\NormalTok{\{}
+  \ControlFlowTok{if}\NormalTok{(type }\SpecialCharTok{==} \StringTok{"sample"}\NormalTok{)\{v }\OtherTok{\textless{}{-}} \FunctionTok{sample}\NormalTok{(n)\}}\ControlFlowTok{else}\NormalTok{\{v }\OtherTok{\textless{}{-}}\NormalTok{ n}\SpecialCharTok{:}\DecValTok{1}\NormalTok{\}}
+  \ControlFlowTok{if}\NormalTok{(func }\SpecialCharTok{==} \StringTok{"insertion\_sort"}\NormalTok{)\{}\FunctionTok{insertion\_sort}\NormalTok{(v)\}}
+  \ControlFlowTok{if}\NormalTok{(func }\SpecialCharTok{==} \StringTok{"heap\_sort"}\NormalTok{)\{}\FunctionTok{heap\_sort}\NormalTok{(v)\} }
+  \ControlFlowTok{if}\NormalTok{(func }\SpecialCharTok{==} \StringTok{"insertion\_sort\_Rcpp"}\NormalTok{)\{}\FunctionTok{insertion\_sort\_Rcpp}\NormalTok{(v)\}}
+  \ControlFlowTok{if}\NormalTok{(func }\SpecialCharTok{==} \StringTok{"heap\_sort\_Rcpp"}\NormalTok{)\{}\FunctionTok{heap\_sort\_Rcpp}\NormalTok{(v)\}}
+\NormalTok{\}}
 \end{Highlighting}
 \end{Shaded}
 
-We evaluate the time with a given \texttt{n} over the 4 algorithms. We
-choose
+\subsection{Un essai}\label{un-essai}
+
+Sur un exemple, on obtient :
 
 \begin{Shaded}
 \begin{Highlighting}[]
 \NormalTok{n }\OtherTok{\textless{}{-}} \DecValTok{10000}
-\end{Highlighting}
-\end{Shaded}
-
-and we get:
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\FunctionTok{one.simu}\NormalTok{(n, }\AttributeTok{func =} \StringTok{"insertion\_sort"}\NormalTok{)}
+\FunctionTok{one.simu.time}\NormalTok{(n, }\AttributeTok{func =} \StringTok{"insertion\_sort"}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
 \begin{verbatim}
-## [1] 1.821
+## [1] 1.815
 \end{verbatim}
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\FunctionTok{one.simu}\NormalTok{(n, }\AttributeTok{func =} \StringTok{"heap\_sort"}\NormalTok{)}
+\FunctionTok{one.simu.time}\NormalTok{(n, }\AttributeTok{func =} \StringTok{"heap\_sort"}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
 \begin{verbatim}
-## [1] 0.608
+## [1] 0.542
 \end{verbatim}
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\FunctionTok{one.simu}\NormalTok{(n, }\AttributeTok{func =} \StringTok{"insertion\_sort\_Rcpp"}\NormalTok{)}
+\FunctionTok{one.simu.time}\NormalTok{(n, }\AttributeTok{func =} \StringTok{"insertion\_sort\_Rcpp"}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
@@ -285,7 +382,7 @@ and we get:
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\FunctionTok{one.simu}\NormalTok{(n, }\AttributeTok{func =} \StringTok{"heap\_sort\_Rcpp"}\NormalTok{)}
+\FunctionTok{one.simu.time}\NormalTok{(n, }\AttributeTok{func =} \StringTok{"heap\_sort\_Rcpp"}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
@@ -293,231 +390,318 @@ and we get:
 ## [1] 0.001
 \end{verbatim}
 
-\subsubsection{Some comparisons}\label{some-comparisons}
+\subsection{Simulations avec
+répétitions}\label{simulations-avec-ruxe9puxe9titions}
 
-we compare the running time with repeated executions (\texttt{nbSimus}
-times)
+On reproduit ces comparaisons de manière plus robuste:
 
 \begin{Shaded}
 \begin{Highlighting}[]
 \NormalTok{nbSimus }\OtherTok{\textless{}{-}} \DecValTok{10}
-\NormalTok{time1 }\OtherTok{\textless{}{-}} \DecValTok{0}\NormalTok{; time2 }\OtherTok{\textless{}{-}} \DecValTok{0}\NormalTok{; time3 }\OtherTok{\textless{}{-}} \DecValTok{0}\NormalTok{; time4 }\OtherTok{\textless{}{-}} \DecValTok{0}
 
-\ControlFlowTok{for}\NormalTok{(i }\ControlFlowTok{in} \DecValTok{1}\SpecialCharTok{:}\NormalTok{nbSimus)\{time1 }\OtherTok{\textless{}{-}}\NormalTok{ time1 }\SpecialCharTok{+} \FunctionTok{one.simu}\NormalTok{(n, }\AttributeTok{func =} \StringTok{"insertion\_sort"}\NormalTok{)\}}
-\ControlFlowTok{for}\NormalTok{(i }\ControlFlowTok{in} \DecValTok{1}\SpecialCharTok{:}\NormalTok{nbSimus)\{time2 }\OtherTok{\textless{}{-}}\NormalTok{ time2 }\SpecialCharTok{+} \FunctionTok{one.simu}\NormalTok{(n, }\AttributeTok{func =} \StringTok{"heap\_sort"}\NormalTok{)\}}
-\ControlFlowTok{for}\NormalTok{(i }\ControlFlowTok{in} \DecValTok{1}\SpecialCharTok{:}\NormalTok{nbSimus)\{time3 }\OtherTok{\textless{}{-}}\NormalTok{ time3 }\SpecialCharTok{+} \FunctionTok{one.simu}\NormalTok{(n, }\AttributeTok{func =} \StringTok{"insertion\_sort\_Rcpp"}\NormalTok{)\}}
-\ControlFlowTok{for}\NormalTok{(i }\ControlFlowTok{in} \DecValTok{1}\SpecialCharTok{:}\NormalTok{nbSimus)\{time4 }\OtherTok{\textless{}{-}}\NormalTok{ time4 }\SpecialCharTok{+} \FunctionTok{one.simu}\NormalTok{(n, }\AttributeTok{func =} \StringTok{"heap\_sort\_Rcpp"}\NormalTok{)\}}
+\NormalTok{time1 }\OtherTok{\textless{}{-}} \FunctionTok{rep}\NormalTok{(}\DecValTok{0}\NormalTok{, nbSimus); time2 }\OtherTok{\textless{}{-}} \FunctionTok{rep}\NormalTok{(}\DecValTok{0}\NormalTok{, nbSimus);}
+\NormalTok{time3 }\OtherTok{\textless{}{-}} \FunctionTok{rep}\NormalTok{(}\DecValTok{0}\NormalTok{, nbSimus); time4 }\OtherTok{\textless{}{-}} \FunctionTok{rep}\NormalTok{(}\DecValTok{0}\NormalTok{, nbSimus)}
+
+\ControlFlowTok{for}\NormalTok{(i }\ControlFlowTok{in} \DecValTok{1}\SpecialCharTok{:}\NormalTok{nbSimus)\{time1[i] }\OtherTok{\textless{}{-}} \FunctionTok{one.simu.time}\NormalTok{(n, }\AttributeTok{func =} \StringTok{"insertion\_sort"}\NormalTok{)\}}
+\ControlFlowTok{for}\NormalTok{(i }\ControlFlowTok{in} \DecValTok{1}\SpecialCharTok{:}\NormalTok{nbSimus)\{time2[i] }\OtherTok{\textless{}{-}} \FunctionTok{one.simu.time}\NormalTok{(n, }\AttributeTok{func =} \StringTok{"insertion\_sort\_Rcpp"}\NormalTok{)\}}
+\ControlFlowTok{for}\NormalTok{(i }\ControlFlowTok{in} \DecValTok{1}\SpecialCharTok{:}\NormalTok{nbSimus)\{time3[i] }\OtherTok{\textless{}{-}} \FunctionTok{one.simu.time}\NormalTok{(n, }\AttributeTok{func =} \StringTok{"heap\_sort"}\NormalTok{)\}}
+\ControlFlowTok{for}\NormalTok{(i }\ControlFlowTok{in} \DecValTok{1}\SpecialCharTok{:}\NormalTok{nbSimus)\{time4[i] }\OtherTok{\textless{}{-}} \FunctionTok{one.simu.time}\NormalTok{(n, }\AttributeTok{func =} \StringTok{"heap\_sort\_Rcpp"}\NormalTok{)\}}
 \end{Highlighting}
 \end{Shaded}
 
-\textbf{Rcpp is 100 to 200 times faster than R for our 2 algorithms.}
+Gain C++ versus R
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\CommentTok{\#gain R {-}\textgreater{} Rcpp}
-\NormalTok{time1}\SpecialCharTok{/}\NormalTok{time3}
+\FunctionTok{mean}\NormalTok{(time1)}\SpecialCharTok{/}\FunctionTok{mean}\NormalTok{(time2)}
 \end{Highlighting}
 \end{Shaded}
 
 \begin{verbatim}
-## [1] 203.8791
+## [1] 208.1494
 \end{verbatim}
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{time2}\SpecialCharTok{/}\NormalTok{time4}
+\FunctionTok{mean}\NormalTok{(time3)}\SpecialCharTok{/}\FunctionTok{mean}\NormalTok{(time4)}
 \end{Highlighting}
 \end{Shaded}
 
 \begin{verbatim}
-## [1] 678.875
+## [1] 763.1429
 \end{verbatim}
 
-\textbf{With the data length of \texttt{10000}, heap\_sort runs 10 to 20
-times faster than insert\_sort.}
+Gain tas versus insertion
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\CommentTok{\#gain insertion {-}\textgreater{} heap}
-\NormalTok{time1}\SpecialCharTok{/}\NormalTok{time2}
+\FunctionTok{mean}\NormalTok{(time1)}\SpecialCharTok{/}\FunctionTok{mean}\NormalTok{(time3)}
 \end{Highlighting}
 \end{Shaded}
 
 \begin{verbatim}
-## [1] 3.41613
+## [1] 3.389929
 \end{verbatim}
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{time3}\SpecialCharTok{/}\NormalTok{time4}
+\FunctionTok{mean}\NormalTok{(time2)}\SpecialCharTok{/}\FunctionTok{mean}\NormalTok{(time4)}
 \end{Highlighting}
 \end{Shaded}
 
 \begin{verbatim}
-## [1] 11.375
+## [1] 12.42857
 \end{verbatim}
 
-\textbf{The gain between the slow insertsort R algorithm and the faster
-heapsort Rcpp algorithm is of order 2000 !!!}
+On recommence avec \texttt{n\ =\ 20000} seulement pour le gain avec C++
+pour le tas
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\CommentTok{\#max gain}
-\NormalTok{time1}\SpecialCharTok{/}\NormalTok{time4}
+\NormalTok{n }\OtherTok{\textless{}{-}} \DecValTok{20000}
+\NormalTok{nbSimus }\OtherTok{\textless{}{-}} \DecValTok{10}
+\NormalTok{time3 }\OtherTok{\textless{}{-}} \FunctionTok{rep}\NormalTok{(}\DecValTok{0}\NormalTok{, nbSimus); time4 }\OtherTok{\textless{}{-}} \FunctionTok{rep}\NormalTok{(}\DecValTok{0}\NormalTok{, nbSimus)}
+\ControlFlowTok{for}\NormalTok{(i }\ControlFlowTok{in} \DecValTok{1}\SpecialCharTok{:}\NormalTok{nbSimus)\{time3[i] }\OtherTok{\textless{}{-}} \FunctionTok{one.simu.time}\NormalTok{(n, }\AttributeTok{func =} \StringTok{"heap\_sort"}\NormalTok{)\}}
+\ControlFlowTok{for}\NormalTok{(i }\ControlFlowTok{in} \DecValTok{1}\SpecialCharTok{:}\NormalTok{nbSimus)\{time4[i] }\OtherTok{\textless{}{-}} \FunctionTok{one.simu.time}\NormalTok{(n, }\AttributeTok{func =} \StringTok{"heap\_sort\_Rcpp"}\NormalTok{)\}}
+\FunctionTok{median}\NormalTok{(time3)}\SpecialCharTok{/}\FunctionTok{median}\NormalTok{(time4)}
 \end{Highlighting}
 \end{Shaded}
 
 \begin{verbatim}
-## [1] 2319.125
+## [1] 1966
 \end{verbatim}
 
-\subsection{Microblenchmark}\label{microblenchmark}
+\textbf{Conclusion:}
 
-You need the packages \texttt{microbenchmark} and \texttt{ggplot2} to
-run the simulations and plot the results (in violin plots). We compare
-\texttt{insertion\_sort\_Rcpp} with \texttt{heap\_sort\_Rcpp} for data
-lengths \texttt{n\ =\ 1000} and \texttt{n\ =\ 10000}.
+\begin{itemize}
+\item
+  pour une taille de \texttt{10000} la gain avec C++ atteint un facteur
+  500 entre le tas C++ et le tas R. Ce gain semble augmenter avec la
+  taille.
+\item
+  Sans surprise, le tri par tas est plus rapide que le tri par
+  insertion.
+\end{itemize}
+
+\subsection{\texorpdfstring{Simulations avec
+\texttt{microbenchmark}}{Simulations avec microbenchmark}}\label{simulations-avec-microbenchmark}
+
+Vous avez besoin des packages \texttt{microbenchmark} et
+\texttt{ggplot2} pour exécuter les simulations et afficher les résultats
+(sous forme de diagrammes en violon). Nous comparons
+\texttt{insertion\_sort\_Rcpp} avec \texttt{heap\_sort\_Rcpp} pour des
+tailles de données \texttt{n\ =\ 1000} et \texttt{n\ =\ 10000}.
 
 \begin{Shaded}
 \begin{Highlighting}[]
 \FunctionTok{library}\NormalTok{(microbenchmark)}
 \FunctionTok{library}\NormalTok{(ggplot2)}
-\NormalTok{n }\OtherTok{\textless{}{-}} \DecValTok{1000}
-\NormalTok{res }\OtherTok{\textless{}{-}} \FunctionTok{microbenchmark}\NormalTok{(}\FunctionTok{one.simu}\NormalTok{(n, }\AttributeTok{func =} \StringTok{"insertion\_sort\_Rcpp"}\NormalTok{), }\FunctionTok{one.simu}\NormalTok{(n, }\AttributeTok{func =} \StringTok{"heap\_sort\_Rcpp"}\NormalTok{), }\AttributeTok{times =} \DecValTok{50}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{1_Sorting_analyse_files/figure-latex/benchmark-1.pdf}
+
+\begin{verbatim}
+## # A tibble: 6 x 8
+##        n expr            min_time q1_time median_time mean_time q3_time max_time
+##    <dbl> <fct>              <dbl>   <dbl>       <dbl>     <dbl>   <dbl>    <dbl>
+## 1    100 insertion_sort   0.00709 7.54e-3     0.00789   0.00846 8.76e-3   0.0207
+## 2    100 heap_sort        0.00894 9.61e-3     0.00994   0.0692  1.05e-2   2.94  
+## 3   5000 insertion_sort   2.32    2.37e+0     2.39      2.39    2.41e+0   2.44  
+## 4   5000 heap_sort        0.468   4.71e-1     0.475     0.477   4.82e-1   0.527 
+## 5 100000 insertion_sort 895.      9.08e+2   924.      919.      9.30e+2 935.    
+## 6 100000 heap_sort       12.0     1.22e+1    12.3      12.4     1.23e+1  16.7
+\end{verbatim}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\section{Evaluation de la
+complexité}\label{evaluation-de-la-complexituxe9}
+
+Les vecteurs de longueurs \texttt{vector\_n\_insertion} et
+\texttt{vector\_n\_heap} (\texttt{n} dans les dataframes) sont choisis
+sur l'echelle logarithmique afin d'avoir un pas constant sur l'échelle
+logarithmique en abscisse pour la régression.
+
+On réalise 10 répétitions pour chaque valeur de \texttt{n} et pour
+chaque algorithme. Les barres d'erreur sont placées en ``mean +/- sd''.
+
+\includegraphics{1_Sorting_analyse_files/figure-latex/simu complexite-1.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{res\_Heap}
 \end{Highlighting}
 \end{Shaded}
 
 \begin{verbatim}
-## Warning in microbenchmark(one.simu(n, func = "insertion_sort_Rcpp"),
-## one.simu(n, : less accurate nanosecond times to avoid potential integer
-## overflows
+##         n mean_time      sd_time
+## 1   10000    0.0009 3.162278e-04
+## 2   11288    0.0010 4.493867e-15
+## 3   12743    0.0010 7.338454e-15
+## 4   14384    0.0010 4.493867e-15
+## 5   16238    0.0016 5.163978e-04
+## 6   18330    0.0014 5.163978e-04
+## 7   20691    0.0016 5.163978e-04
+## 8   23357    0.0020 6.864495e-15
+## 9   26367    0.0021 3.162278e-04
+## 10  29764    0.0025 5.270463e-04
+## 11  33598    0.0030 0.000000e+00
+## 12  37927    0.0032 4.216370e-04
+## 13  42813    0.0037 4.830459e-04
+## 14  48329    0.0043 4.830459e-04
+## 15  54556    0.0050 7.338454e-15
+## 16  61585    0.0056 5.163978e-04
+## 17  69519    0.0063 4.830459e-04
+## 18  78476    0.0072 4.216370e-04
+## 19  88587    0.0084 5.163978e-04
+## 20 100000    0.0094 5.163978e-04
 \end{verbatim}
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\FunctionTok{autoplot}\NormalTok{(res)}
-\end{Highlighting}
-\end{Shaded}
-
-\includegraphics{1_Sorting_analyse_files/figure-latex/unnamed-chunk-11-1.pdf}
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{res}
+\NormalTok{res\_Insertion}
 \end{Highlighting}
 \end{Shaded}
 
 \begin{verbatim}
-## Unit: milliseconds
-##                                       expr      min       lq     mean   median
-##  one.simu(n, func = "insertion_sort_Rcpp") 27.96967 28.32075 28.94554 28.49625
-##       one.simu(n, func = "heap_sort_Rcpp") 27.96479 28.30283 28.86995 28.55609
-##        uq      max neval
-##  29.10926 34.54057    50
-##  28.97987 33.29491    50
+##        n mean_time      sd_time
+## 1   5000    0.0021 0.0003162278
+## 2   5644    0.0029 0.0003162278
+## 3   6371    0.0038 0.0004216370
+## 4   7192    0.0048 0.0004216370
+## 5   8119    0.0061 0.0003162278
+## 6   9165    0.0075 0.0005270463
+## 7  10346    0.0095 0.0005270463
+## 8  11679    0.0123 0.0004830459
+## 9  13183    0.0156 0.0005163978
+## 10 14882    0.0197 0.0004830459
+## 11 16799    0.0257 0.0004830459
+## 12 18963    0.0326 0.0005163978
+## 13 21407    0.0424 0.0006992059
+## 14 24165    0.0549 0.0007378648
+## 15 27278    0.0705 0.0009718253
+## 16 30792    0.0897 0.0014181365
+## 17 34760    0.1148 0.0018135294
+## 18 39238    0.1466 0.0059665736
+## 19 44293    0.1838 0.0027406406
+## 20 50000    0.2344 0.0041686662
 \end{verbatim}
 
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{n }\OtherTok{\textless{}{-}} \DecValTok{10000}
-\NormalTok{res }\OtherTok{\textless{}{-}} \FunctionTok{microbenchmark}\NormalTok{(}\FunctionTok{one.simu}\NormalTok{(n, }\AttributeTok{func =} \StringTok{"insertion\_sort\_Rcpp"}\NormalTok{), }\FunctionTok{one.simu}\NormalTok{(n, }\AttributeTok{func =} \StringTok{"heap\_sort\_Rcpp"}\NormalTok{), }\AttributeTok{times =} \DecValTok{50}\NormalTok{)}
-\FunctionTok{autoplot}\NormalTok{(res)}
-\end{Highlighting}
-\end{Shaded}
-
-\includegraphics{1_Sorting_analyse_files/figure-latex/unnamed-chunk-12-1.pdf}
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{res}
-\end{Highlighting}
-\end{Shaded}
-
-\begin{verbatim}
-## Unit: milliseconds
-##                                       expr      min       lq     mean   median
-##  one.simu(n, func = "insertion_sort_Rcpp") 42.97636 43.95380 47.68060 45.55670
-##       one.simu(n, func = "heap_sort_Rcpp") 34.73479 35.73892 39.38135 36.70509
-##        uq      max neval
-##  48.18328 67.58534    50
-##  39.43081 65.79742    50
-\end{verbatim}
-
-At this data length \texttt{10000} we start having a robust difference
-in running time.
-
-\subsection{Time complexity}\label{time-complexity}
-
-We run \texttt{nbRep\ =\ 50} times the \texttt{heap\_sort\_Rcpp}
-algorithm of each value of the \texttt{vector\_n} vector of length
-\texttt{nbSimus\ =\ 20}. We show the plot of the mean running time with
-respect to data length.
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{nbSimus }\OtherTok{\textless{}{-}} \DecValTok{20}
-\NormalTok{vector\_n }\OtherTok{\textless{}{-}} \FunctionTok{seq}\NormalTok{(}\AttributeTok{from =} \DecValTok{10000}\NormalTok{, }\AttributeTok{to =} \DecValTok{100000}\NormalTok{, }\AttributeTok{length.out =}\NormalTok{ nbSimus)}
-\NormalTok{nbRep }\OtherTok{\textless{}{-}} \DecValTok{50}
-\NormalTok{res\_Heap }\OtherTok{\textless{}{-}} \FunctionTok{data.frame}\NormalTok{(}\FunctionTok{matrix}\NormalTok{(}\DecValTok{0}\NormalTok{, nbSimus, nbRep }\SpecialCharTok{+} \DecValTok{1}\NormalTok{))}
-\FunctionTok{colnames}\NormalTok{(res\_Heap) }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\StringTok{"n"}\NormalTok{, }\FunctionTok{paste0}\NormalTok{(}\StringTok{"Rep"}\NormalTok{,}\DecValTok{1}\SpecialCharTok{:}\NormalTok{nbRep))}
-
-\NormalTok{j }\OtherTok{\textless{}{-}} \DecValTok{1}
-\ControlFlowTok{for}\NormalTok{(i }\ControlFlowTok{in}\NormalTok{ vector\_n)}
-\NormalTok{\{}
-\NormalTok{  res\_Heap[j,] }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(i, }\FunctionTok{replicate}\NormalTok{(nbRep, }\FunctionTok{one.simu}\NormalTok{(i, }\AttributeTok{func =} \StringTok{"heap\_sort\_Rcpp"}\NormalTok{)))  }
-  \CommentTok{\#print(j)}
-\NormalTok{  j }\OtherTok{\textless{}{-}}\NormalTok{ j }\SpecialCharTok{+} \DecValTok{1}
-\NormalTok{\}}
-
-\NormalTok{res }\OtherTok{\textless{}{-}} \FunctionTok{rowMeans}\NormalTok{(res\_Heap[,}\SpecialCharTok{{-}}\DecValTok{1}\NormalTok{])}
-\FunctionTok{plot}\NormalTok{(vector\_n, res, }\AttributeTok{type =} \StringTok{\textquotesingle{}b\textquotesingle{}}\NormalTok{, }\AttributeTok{xlab =} \StringTok{"data length"}\NormalTok{, }\AttributeTok{ylab =} \StringTok{"mean time in seconds"}\NormalTok{)}
-\end{Highlighting}
-\end{Shaded}
-
-\includegraphics{1_Sorting_analyse_files/figure-latex/unnamed-chunk-13-1.pdf}
-
-Same strategy but with the \texttt{insertion\_sort\_Rcpp} algorithm. We
-get the power in complexity model \(O(n^r)\) by fitting a linear model
-in log scale. The slope coefficient \(r\) is very close to 2 as
-expected.
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{nbSimus }\OtherTok{\textless{}{-}} \DecValTok{20}
-\NormalTok{vector\_n }\OtherTok{\textless{}{-}} \FunctionTok{seq}\NormalTok{(}\AttributeTok{from =} \DecValTok{5000}\NormalTok{, }\AttributeTok{to =} \DecValTok{50000}\NormalTok{, }\AttributeTok{length.out =}\NormalTok{ nbSimus)}
-\NormalTok{nbRep }\OtherTok{\textless{}{-}} \DecValTok{50}
-\NormalTok{res\_Insertion }\OtherTok{\textless{}{-}} \FunctionTok{data.frame}\NormalTok{(}\FunctionTok{matrix}\NormalTok{(}\DecValTok{0}\NormalTok{, nbSimus, nbRep }\SpecialCharTok{+} \DecValTok{1}\NormalTok{))}
-\FunctionTok{colnames}\NormalTok{(res\_Insertion) }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\StringTok{"n"}\NormalTok{, }\FunctionTok{paste0}\NormalTok{(}\StringTok{"Rep"}\NormalTok{,}\DecValTok{1}\SpecialCharTok{:}\NormalTok{nbRep))}
-
-\NormalTok{j }\OtherTok{\textless{}{-}} \DecValTok{1}
-\ControlFlowTok{for}\NormalTok{(i }\ControlFlowTok{in}\NormalTok{ vector\_n)}
-\NormalTok{\{}
-\NormalTok{  res\_Insertion[j,] }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(i, }\FunctionTok{replicate}\NormalTok{(nbRep, }\FunctionTok{one.simu}\NormalTok{(i, }\AttributeTok{func =} \StringTok{"insertion\_sort\_Rcpp"}\NormalTok{)))  }
-  \CommentTok{\#print(j)}
-\NormalTok{  j }\OtherTok{\textless{}{-}}\NormalTok{ j }\SpecialCharTok{+} \DecValTok{1}
-\NormalTok{\}}
-
-\NormalTok{res }\OtherTok{\textless{}{-}} \FunctionTok{rowMeans}\NormalTok{(res\_Insertion[,}\SpecialCharTok{{-}}\DecValTok{1}\NormalTok{])}
-\FunctionTok{plot}\NormalTok{(vector\_n, res, }\AttributeTok{type =} \StringTok{\textquotesingle{}b\textquotesingle{}}\NormalTok{, }\AttributeTok{xlab =} \StringTok{"data length"}\NormalTok{, }\AttributeTok{ylab =} \StringTok{"mean time in seconds"}\NormalTok{)}
-\end{Highlighting}
-\end{Shaded}
-
-\includegraphics{1_Sorting_analyse_files/figure-latex/unnamed-chunk-14-1.pdf}
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\FunctionTok{lm}\NormalTok{(}\FunctionTok{log}\NormalTok{(res) }\SpecialCharTok{\textasciitilde{}} \FunctionTok{log}\NormalTok{(vector\_n))}
-\end{Highlighting}
-\end{Shaded}
+On vérifie la valeur du coefficient directeur pour les deux méthodes:
 
 \begin{verbatim}
 ## 
 ## Call:
-## lm(formula = log(res) ~ log(vector_n))
+## lm(formula = log(res_Insertion$mean_time) ~ log(res_Insertion$n))
+## 
+## Residuals:
+##       Min        1Q    Median        3Q       Max 
+## -0.056330 -0.013396 -0.004171  0.013740  0.045334 
 ## 
 ## Coefficients:
-##   (Intercept)  log(vector_n)  
-##       -23.417          2.033
+##                        Estimate Std. Error t value Pr(>|t|)    
+## (Intercept)          -23.381572   0.075886  -308.1   <2e-16 ***
+## log(res_Insertion$n)   2.027908   0.007828   259.0   <2e-16 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 0.02447 on 18 degrees of freedom
+## Multiple R-squared:  0.9997, Adjusted R-squared:  0.9997 
+## F-statistic: 6.711e+04 on 1 and 18 DF,  p-value: < 2.2e-16
 \end{verbatim}
+
+\begin{verbatim}
+## Estimated exponent: 2.027908
+\end{verbatim}
+
+\begin{verbatim}
+## 
+## Call:
+## lm(formula = log(res_Heap$mean_time) ~ log(res_Heap$n))
+## 
+## Residuals:
+##       Min        1Q    Median        3Q       Max 
+## -0.167735 -0.034582  0.005972  0.028454  0.173666 
+## 
+## Coefficients:
+##                  Estimate Std. Error t value Pr(>|t|)    
+## (Intercept)     -16.89548    0.25406  -66.50   <2e-16 ***
+## log(res_Heap$n)   1.06075    0.02446   43.36   <2e-16 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 0.07645 on 18 degrees of freedom
+## Multiple R-squared:  0.9905, Adjusted R-squared:   0.99 
+## F-statistic:  1880 on 1 and 18 DF,  p-value: < 2.2e-16
+\end{verbatim}
+
+\begin{verbatim}
+## Estimated exponent: 1.060748
+\end{verbatim}
+
+Les coefficients dfirecteurs trouvés sont bien ceux que l'on attendait.
+La valeur 2 pour l'insertion et 1 pour le tas.
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\section{Cas particulier des données presque
+triées}\label{cas-particulier-des-donnuxe9es-presque-triuxe9es}
+
+On considère des données triées avec 5\% de valeurs échangées au hasard.
+
+Sur un exemple cela donne :
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{v }\OtherTok{\textless{}{-}} \DecValTok{1}\SpecialCharTok{:}\DecValTok{100}
+\NormalTok{n\_swap }\OtherTok{\textless{}{-}} \FunctionTok{floor}\NormalTok{(}\FloatTok{0.05} \SpecialCharTok{*} \FunctionTok{length}\NormalTok{(v))}
+\NormalTok{swap\_indices }\OtherTok{\textless{}{-}} \FunctionTok{sample}\NormalTok{(}\FunctionTok{length}\NormalTok{(v), n\_swap)}
+\NormalTok{v[swap\_indices] }\OtherTok{\textless{}{-}} \FunctionTok{sample}\NormalTok{(v[swap\_indices])}
+\NormalTok{v}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##   [1]   1   2   3   4   5   6   7   8   9  10  11  12  13  14  15  16  17  79
+##  [19]  19  20  21  22  23  24  25  26  27  28  29  30  31  32  33  34  35  36
+##  [37]  37  38  39  40  97  42  43  44  45  46  47  48  49  50  51  52  53  54
+##  [55]  55  56  57  58  59  60  61  62  63  64  65  66  67  68  69  70  71  72
+##  [73]  73  74  75  76  77  78  41  80  18  82  83  84  85  86  87  88  89  90
+##  [91]  91  92  93  94  95  96  81  98  99 100
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{one.simu2 }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{(n, func)}
+\NormalTok{\{}
+\NormalTok{  v }\OtherTok{\textless{}{-}} \DecValTok{1}\SpecialCharTok{:}\NormalTok{n}
+\NormalTok{  n\_swap }\OtherTok{\textless{}{-}} \FunctionTok{floor}\NormalTok{(}\FloatTok{0.05} \SpecialCharTok{*} \FunctionTok{length}\NormalTok{(v))}
+\NormalTok{  swap\_indices }\OtherTok{\textless{}{-}} \FunctionTok{sample}\NormalTok{(}\FunctionTok{length}\NormalTok{(v), n\_swap)}
+\NormalTok{  v[swap\_indices] }\OtherTok{\textless{}{-}} \FunctionTok{sample}\NormalTok{(v[swap\_indices])}
+  \ControlFlowTok{if}\NormalTok{(func }\SpecialCharTok{==} \StringTok{"insertion\_sort"}\NormalTok{)\{}\FunctionTok{insertion\_sort}\NormalTok{(v)\}}
+  \ControlFlowTok{if}\NormalTok{(func }\SpecialCharTok{==} \StringTok{"heap\_sort"}\NormalTok{)\{}\FunctionTok{heap\_sort}\NormalTok{(v)\} }
+  \ControlFlowTok{if}\NormalTok{(func }\SpecialCharTok{==} \StringTok{"insertion\_sort\_Rcpp"}\NormalTok{)\{}\FunctionTok{insertion\_sort\_Rcpp}\NormalTok{(v)\}}
+  \ControlFlowTok{if}\NormalTok{(func }\SpecialCharTok{==} \StringTok{"heap\_sort\_Rcpp"}\NormalTok{)\{}\FunctionTok{heap\_sort\_Rcpp}\NormalTok{(v)\}}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{1_Sorting_analyse_files/figure-latex/benchmark2-1.pdf}
+
+\begin{verbatim}
+## # A tibble: 4 x 8
+##       n expr           min_time q1_time median_time mean_time q3_time max_time
+##   <dbl> <fct>             <dbl>   <dbl>       <dbl>     <dbl>   <dbl>    <dbl>
+## 1  1000 insertion_sort   0.0166  0.0178      0.0186    0.0868  0.0195   3.42  
+## 2  1000 heap_sort        0.0516  0.0555      0.0568    0.0579  0.0579   0.0795
+## 3 10000 insertion_sort   0.684   0.723       0.748     0.745   0.759    0.957 
+## 4 10000 heap_sort        0.571   0.594       0.599     0.598   0.603    0.641
+\end{verbatim}
+
+L'algorithme d'insertion est ici plus rapide pour la longueur
+\texttt{1000}. Cela est dû au fait que pour un vecteur déjà trié,
+l'algorithme d'insertion est linéaire et nous sommes dans un cas proche
+du linéaire.
 
 \end{document}

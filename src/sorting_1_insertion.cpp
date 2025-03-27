@@ -19,7 +19,7 @@ using namespace Rcpp; //to use the NumericVector object
 //'
 //' @details
 //'  \itemize{
-//'   \item \bold{Time Complexity:} O(n²)in the worst and average cases, O(n) in the best case (already sorted data).
+//'   \item \bold{Time Complexity:} O(n²) in the worst and average cases, O(n) in the best case (already sorted data).
 //'   \item \bold{Space Complexity:} O(1) (in-place sorting, no additional memory used).
 //'   \item \bold{Stable Sorting Algorithm:} Maintains the relative order of equal elements.
 //' }

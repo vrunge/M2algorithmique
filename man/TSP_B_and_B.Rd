@@ -19,7 +19,7 @@ A list containing the following elements:
 }
 }
 \description{
-This function implements the **Branch and Bound** algorithm to solve the **Traveling Salesman Problem (TSP)**. 
+This function implements the \bold{Branch and Bound} algorithm to solve the \bold{Traveling Salesman Problem (TSP)}. 
 It explores all possible tours but efficiently prunes branches that cannot lead to a better solution 
 than the best one found so far by using a lower bound to eliminate suboptimal paths.
 

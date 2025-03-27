@@ -13,7 +13,7 @@ heap_sort_Rcpp(v)
 A numeric vector sorted in ascending order.
 }
 \description{
-This function implements **Heap Sort**, an efficient sorting algorithm that 
+This function implements \bold{Heap Sort}, an efficient sorting algorithm that 
 first builds a max-heap and then repeatedly extracts the maximum element to 
 produce a sorted sequence.
 

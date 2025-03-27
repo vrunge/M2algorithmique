@@ -1,19 +1,16 @@
 ---
 title: | 
-  | Analyse des algorithmes de tri
+  | Analyse de deux algorithmes de tri par comparaison
   | ![](Images/logo_lamme.png){width=1in}  ![](Images/logo_UEVE.png){width=1.7in}
   |  M2 Data Science Algorithmique 
 author:  "Vincent Runge"
-date: "lundi 17 mars 2025"
+date: "jeudi 27 mars 2025"
 header-includes:
   - \usepackage[french]{babel}
 output:
   pdf_document:
     keep_tex: yes
     toc: true
-    number_sections: true  
-  html_document:
-    df_print: paged
     number_sections: true  
 urlcolor: blue
 ---
@@ -23,70 +20,82 @@ urlcolor: blue
 
 # Description du problème et objectif
 
-Insertion sort is of time complexity **$O(n^2)$** as heap sort is **$O(n\log(n))$** (worst case complexity). We aim at highlighting two important features with this package:
+Nous étudions dans ce document le problème très classique du tri des éléments d'un vecteur. Ce problème consiste à trier par ordre croissant les éléments d'un vecteur initialement non-trié. 
 
-1. Rcpp algorithms are **much more efficient** than their R counterpart
-2. Time complexities **can be compared to** one another
+Il est intéressant de remarquer que de nombreuses méthodes algorithmiques répondent à ce problème. Elles se distinguent par leur temps d'exécution et par la mémoire nécessaire à résoudre la tâche. La question centrale est ici celle du temps d'exécution.
 
-*All the simulations presented in this README file are available in the `myTests.R` file in the forStudents folder which also contains the Rmd file generating this README.md.*
+[La page wikipédia du tri](https://fr.wikipedia.org/wiki/Algorithme_de_tri) rassemble de nombreux algorithmes de tri avec leurs avantages et inconvénients respectifs. La complexité du problème de tri (par comparaison) est de $O(n \log n)$ pour un vecteur de longueur $n$. Cela signifie que, théoriquement, aucun algorithme ne pourra jamais être plus rapide que cette borne asymptotique. Le *radix sort* et quelques autres algorithmes sont en temps $O(n)$ mais demandent des hypothèses supplémentaires sur les données (ce n'est plus un tri par comparaison).
+
+Dans ce document, nous concentrons notre attention sur deux algorithmes de tri:
+
+1) le tri par insertion, de complexité **$O(n^2)$**
+
+2) le tri par tas (*heap sort*), de complexité **$O(n \log(n))$**. Des détails sur le [tri par tas](https://en.wikipedia.org/wiki/Heapsort) sont donnés dans le lien, en particulier les animations donnent une bonne idée du fonctionnement d'un tas.
 
 
-Details on the heapsort algorithm can be found on [its wikipedia page](https://en.wikipedia.org/wiki/Heapsort). This gif provides a graphical representation of its mechanisms.
+Nous avons donc ici deux méthodes l'une naïve, l'autre plus évoluée. Nos objectifs sont alors:
 
+a) d'implémenter ces algorithmes en R et en C++ et évaluer le gain de temps;
 
+b) de confirmer les complexités théoriques trouvées sur le papier (ce n'est pas fait dans ce document mais a été fait dans le cours) par des simulations intensives.
 
+___ 
 
-### Package installation
+À noter que le (b) se termine toujours par l'évaluation d'une pente sur une régression linéaire en échelle log-log. Cela donne une évaluation de la valeur $x$ dans la complexité de type $O(n^x)$ ou $O(n^x \log^y(n))$.
 
-You first need to install the `devtools` package, it can be done easily from Rstudio.
-We install the package from Github (remove the # sign):
+Nous allons ajouter une étape en plus. En effet, l'évaluation de la complexité se fait sur des données simulées, issues d'une certaine distribution de probabilité. Nous souhaitons étudier le temps d'exécution dans un cas plus favorable à l'algorithme d'insertion.
+
+___ 
+
+# Un premier exemple
+
+Le package se télécharge ainsi :
+
+```{r, eval=FALSE}
+devtools::install_github("vrunge/M2algorithmique")
+```
+
+et ses fonctions sont rendues disponibles sur Rstudio ainsi :
 
 ```{r}
-#devtools::install_github("vrunge/M2algorithmique")
 library(M2algorithmique)
 ```
 
-### A first simple test
-
-
-We simulate simple data as follows, with `v` a vector as size `n` containing all the integers from `1` to `n` (exactly one time) in any order.
+On simule un petit exemple d'un vecteur `v` de taille `100`
 
 ```{r}
-n <- 10
+n <- 100
 v <- sample(n)
 ```
 
-
-We've implemeted 4 algorithms: 
+On teste les 4 algorithmes implémentés avec des noms explicites : 
 
 - `insertion_sort` 
 - `heap_sort` 
 - `insertion_sort_Rcpp` 
 - `heap_sort_Rcpp` 
 
-They all have a unique argument: the unsorted vector `v`.
+Cela donne :
 
 ```{r}
 v
 insertion_sort(v)
+heap_sort(v)
+insertion_sort_Rcpp(v)
+heap_sort_Rcpp(v)
 ```
 
 
-`insertion_sort(v)` returns the sorted vector from `v`.
- 
- 
-<a id="com"></a>
+___ 
 
-## The 4 algorithms at fixed data length
+# Comparaison R avec C++
 
-We run all the following examples at fixed vector length `n = 10000`.
+On va faire des comparaisons pour les deux types d'algorithme en R et C++ pour quantifier leur différence de performance.
 
-### One simulation 
-
-We define a function `one.simu` to simplify the simulation study for time complexity.
+La fonction `one.simu.time` retourne le temps recherché, et `one.simu` sera utilisé par `microbenchmark`
 
 ```{r}
-one.simu <- function(n, type = "sample", func = "insertion_sort")
+one.simu.time <- function(n, type = "sample", func = "insertion_sort")
 {
   if(type == "sample"){v <- sample(n)}else{v <- n:1}
   if(func == "insertion_sort"){t <- system.time(insertion_sort(v))[[1]]}
@@ -95,126 +104,299 @@ one.simu <- function(n, type = "sample", func = "insertion_sort")
   if(func == "heap_sort_Rcpp"){t <- system.time(heap_sort_Rcpp(v))[[1]]}
   return(t)
 }
+
+one.simu <- function(n, type = "sample", func = "insertion_sort")
+{
+  if(type == "sample"){v <- sample(n)}else{v <- n:1}
+  if(func == "insertion_sort"){insertion_sort(v)}
+  if(func == "heap_sort"){heap_sort(v)} 
+  if(func == "insertion_sort_Rcpp"){insertion_sort_Rcpp(v)}
+  if(func == "heap_sort_Rcpp"){heap_sort_Rcpp(v)}
+}
 ```
 
-We evaluate the time with a given `n` over the 4 algorithms. We choose
+## Un essai
+
+Sur un exemple, on obtient :
+
 ```{r}
 n <- 10000
+one.simu.time(n, func = "insertion_sort")
+one.simu.time(n, func = "heap_sort")
+one.simu.time(n, func = "insertion_sort_Rcpp")
+one.simu.time(n, func = "heap_sort_Rcpp")
 ```
 
-and we get:
 
-```{r}
-one.simu(n, func = "insertion_sort")
-one.simu(n, func = "heap_sort")
-one.simu(n, func = "insertion_sort_Rcpp")
-one.simu(n, func = "heap_sort_Rcpp")
-```
+## Simulations avec répétitions
 
-### Some comparisons
+On reproduit ces comparaisons de manière plus robuste:
 
-we compare the running time with repeated executions (`nbSimus` times)
-
-```{r}
+```{r first simu}
 nbSimus <- 10
-time1 <- 0; time2 <- 0; time3 <- 0; time4 <- 0
 
-for(i in 1:nbSimus){time1 <- time1 + one.simu(n, func = "insertion_sort")}
-for(i in 1:nbSimus){time2 <- time2 + one.simu(n, func = "heap_sort")}
-for(i in 1:nbSimus){time3 <- time3 + one.simu(n, func = "insertion_sort_Rcpp")}
-for(i in 1:nbSimus){time4 <- time4 + one.simu(n, func = "heap_sort_Rcpp")}
+time1 <- rep(0, nbSimus); time2 <- rep(0, nbSimus);
+time3 <- rep(0, nbSimus); time4 <- rep(0, nbSimus)
+
+for(i in 1:nbSimus){time1[i] <- one.simu.time(n, func = "insertion_sort")}
+for(i in 1:nbSimus){time2[i] <- one.simu.time(n, func = "insertion_sort_Rcpp")}
+for(i in 1:nbSimus){time3[i] <- one.simu.time(n, func = "heap_sort")}
+for(i in 1:nbSimus){time4[i] <- one.simu.time(n, func = "heap_sort_Rcpp")}
 ```
 
-**Rcpp is 100 to 200 times faster than R for our 2 algorithms.**
+Gain C++ versus R
+
 ```{r}
-#gain R -> Rcpp
-time1/time3
-time2/time4
+mean(time1)/mean(time2)
+mean(time3)/mean(time4)
 ```
 
-**With the data length of `10000`, heap_sort runs 10 to 20 times faster than insert_sort.**
+Gain tas versus insertion
+
 ```{r}
-#gain insertion -> heap
-time1/time2
-time3/time4
+mean(time1)/mean(time3)
+mean(time2)/mean(time4)
 ```
 
-**The gain between the slow insertsort R algorithm and the faster heapsort Rcpp algorithm is of order 2000 !!!**
-```{r}
-#max gain
-time1/time4
+On recommence avec `n = 20000` seulement pour le gain avec C++ pour le tas
+
+```{r second simu}
+n <- 20000
+nbSimus <- 10
+time3 <- rep(0, nbSimus); time4 <- rep(0, nbSimus)
+for(i in 1:nbSimus){time3[i] <- one.simu.time(n, func = "heap_sort")}
+for(i in 1:nbSimus){time4[i] <- one.simu.time(n, func = "heap_sort_Rcpp")}
+median(time3)/median(time4)
 ```
 
-<a id="micro"></a>
 
-## Microblenchmark
+**Conclusion:**
 
-You need the packages `microbenchmark` and `ggplot2` to run the simulations and plot the results (in violin plots). We compare `insertion_sort_Rcpp` with `heap_sort_Rcpp` for data lengths `n = 1000` and `n = 10000`.
+- pour une taille de `10000` la gain avec C++ atteint un facteur 500 entre le tas C++ et le tas R. Ce gain semble augmenter avec la taille. 
+
+- Sans surprise, le tri par tas est plus rapide que le tri par insertion.
+
+## Simulations avec `microbenchmark`
+
+Vous avez besoin des packages `microbenchmark` et `ggplot2` pour exécuter les simulations et afficher les résultats (sous forme de diagrammes en violon). Nous comparons `insertion_sort_Rcpp` avec `heap_sort_Rcpp` pour des tailles de données `n = 1000` et `n = 10000`.
 
 ```{r}
 library(microbenchmark)
 library(ggplot2)
-n <- 1000
-res <- microbenchmark(one.simu(n, func = "insertion_sort_Rcpp"), one.simu(n, func = "heap_sort_Rcpp"), times = 50)
-autoplot(res)
-res
 ```
 
-```{r}
-n <- 10000
-res <- microbenchmark(one.simu(n, func = "insertion_sort_Rcpp"), one.simu(n, func = "heap_sort_Rcpp"), times = 50)
-autoplot(res)
-res
-```
-
-At this data length `10000` we start having a robust difference in running time.
-
-
-<a id="time"></a>
-
-## Time complexity
-
-We run `nbRep = 50` times the `heap_sort_Rcpp` algorithm of each value of the `vector_n` vector of length `nbSimus = 20`. We show the plot of the mean running time with respect to data length.
-
-```{r}
-nbSimus <- 20
-vector_n <- seq(from = 10000, to = 100000, length.out = nbSimus)
-nbRep <- 50
-res_Heap <- data.frame(matrix(0, nbSimus, nbRep + 1))
-colnames(res_Heap) <- c("n", paste0("Rep",1:nbRep))
-
-j <- 1
-for(i in vector_n)
+```{r benchmark, echo = FALSE, warning=FALSE, message=FALSE}
+# Function to run benchmark
+benchmark_sorting <- function(n, times = 50)
 {
-  res_Heap[j,] <- c(i, replicate(nbRep, one.simu(i, func = "heap_sort_Rcpp")))  
-  #print(j)
-  j <- j + 1
+  microbenchmark(
+    insertion_sort = one.simu(n, func = "insertion_sort_Rcpp"),
+    heap_sort = one.simu(n, func = "heap_sort_Rcpp"),
+    times = times,
+    control = list(gc = FALSE)
+  )
+}
+# Run benchmarks for different n values
+n_values <- c(100, 5000, 100000)
+results <- lapply(n_values, benchmark_sorting)
+
+# Combine results into a single dataframe with n as an identifier
+df_results <- do.call(rbind, Map(cbind, results, n = n_values))
+# Plot with better aesthetics
+ggplot(df_results, aes(x = expr, y = time / 1e6, fill = expr)) +
+  geom_violin(alpha = 0.7) +
+  facet_wrap(~n, scales = "free") +
+  labs(title = "Sorting Algorithm in Rcpp Benchmark",
+       x = "Sorting Algorithm",
+       y = "Execution Time (ms)",
+       fill = "Algorithm") +
+  theme_minimal()
+```
+
+```{r, echo = FALSE, warning=FALSE, message=FALSE}
+library(dplyr)
+df_results %>%
+  group_by(n, expr) %>%
+  summarise(
+    min_time = min(time) / 1e6,   # Convert nanoseconds to milliseconds
+    q1_time = quantile(time, 0.25) / 1e6,
+    median_time = median(time) / 1e6,
+    mean_time = mean(time) / 1e6,
+    q3_time = quantile(time, 0.75) / 1e6,
+    max_time = max(time) / 1e6,
+    .groups = "drop"
+  )
+```
+
+
+___ 
+
+
+# Evaluation de la complexité
+
+Les vecteurs de longueurs `vector_n_insertion` et `vector_n_heap` (`n` dans les dataframes) sont choisis sur l'echelle logarithmique afin d'avoir un pas constant sur l'échelle logarithmique en abscisse pour la régression.
+
+On réalise 10 répétitions pour chaque valeur de `n` et pour chaque algorithme. Les barres d'erreur sont placées en "mean +/- sd". 
+
+```{r simu complexite, echo = FALSE, warning=FALSE, message=FALSE}
+library(ggplot2)
+library(dplyr)
+
+# Function to run benchmarking with mean and standard deviation
+benchmark_sorting <- function(func_name, n_values, nbRep) {
+  results <- sapply(n_values, function(n) {
+    times <- replicate(nbRep, one.simu.time(n, func = func_name))  # Run simulations
+    c(mean_time = mean(times), sd_time = sd(times))  # Return mean & std dev
+  })
+  
+  # Convert results to a data frame
+  data.frame(n = n_values, mean_time = results["mean_time",], sd_time = results["sd_time",])
 }
 
-res <- rowMeans(res_Heap[,-1])
-plot(vector_n, res, type = 'b', xlab = "data length", ylab = "mean time in seconds")
-```
 
-Same strategy but with the `insertion_sort_Rcpp` algorithm. We get the power in complexity model $O(n^r)$ by fitting a linear model in log scale. The slope coefficient $r$ is very close to 2 as expected.
+
+# Parameters
+nbSimus <- 20
+nbRep <- 10
+
+# Heap Sort Benchmark
+vector_n_heap <- exp(seq(log(10000), log(100000), length.out = nbSimus))
+vector_n_heap <- round(vector_n_heap)
+res_Heap <- benchmark_sorting("heap_sort_Rcpp", vector_n_heap, nbRep)
+
+# Insertion Sort Benchmark
+vector_n_insert <- exp(seq(log(5000), log(50000), length.out = nbSimus))
+vector_n_insert <- round(vector_n_insert)
+res_Insertion <- benchmark_sorting("insertion_sort_Rcpp", vector_n_insert, nbRep)
+
+# Log-log plot of sorting performance with error bars
+ggplot() +
+  # Heap Sort
+  geom_line(data = res_Heap, aes(x = n, y = mean_time, color = "Heap Sort"), size = 1) +
+  geom_errorbar(data = res_Heap, 
+                aes(x = n, ymin = mean_time - sd_time, ymax = mean_time + sd_time, color = "Heap Sort"), 
+                width = 0.1, alpha = 0.5) +
+  
+  # Insertion Sort
+  geom_line(data = res_Insertion, aes(x = n, y = mean_time, color = "Insertion Sort"), size = 1) +
+  geom_errorbar(data = res_Insertion, 
+                aes(x = n, ymin = mean_time - sd_time, ymax = mean_time + sd_time, color = "Insertion Sort"), 
+                width = 0.1, alpha = 0.5) +
+
+  # Log-log scales
+  scale_x_log10() +
+  scale_y_log10() +
+  
+  # Labels & theme
+  labs(title = "Sorting Algorithm Performance (Log-Log Scale with Error Bars)",
+       x = "Data Length (log scale)", 
+       y = "Mean Running Time (log scale)",
+       color = "Algorithm") +
+  theme_minimal()
+
+```
 
 ```{r}
-nbSimus <- 20
-vector_n <- seq(from = 5000, to = 50000, length.out = nbSimus)
-nbRep <- 50
-res_Insertion <- data.frame(matrix(0, nbSimus, nbRep + 1))
-colnames(res_Insertion) <- c("n", paste0("Rep",1:nbRep))
-
-j <- 1
-for(i in vector_n)
-{
-  res_Insertion[j,] <- c(i, replicate(nbRep, one.simu(i, func = "insertion_sort_Rcpp")))  
-  #print(j)
-  j <- j + 1
-}
-
-res <- rowMeans(res_Insertion[,-1])
-plot(vector_n, res, type = 'b', xlab = "data length", ylab = "mean time in seconds")
-lm(log(res) ~ log(vector_n))
+res_Heap
+res_Insertion
 ```
+
+On vérifie la valeur du coefficient directeur pour les deux méthodes:
+
+```{r, echo = FALSE, warning=FALSE, message=FALSE}
+model <- lm(log(res_Insertion$mean_time) ~ log(res_Insertion$n))
+print(summary(model)) 
+slope_r <- coef(model)[2]
+cat("Estimated exponent:", slope_r, "\n")
+```
+
+
+```{r, echo = FALSE, warning=FALSE, message=FALSE}
+model <- lm(log(res_Heap$mean_time) ~ log(res_Heap$n))
+print(summary(model)) 
+slope_r <- coef(model)[2]
+cat("Estimated exponent:", slope_r, "\n")
+```
+
+Les coefficients dfirecteurs trouvés sont bien ceux que l'on attendait. La valeur 2 pour l'insertion et 1 pour le tas.
+
+
+___ 
+
+
+# Cas particulier des données presque triées
+
+On considère des données triées avec 5% de valeurs échangées au hasard.
+
+Sur un exemple cela donne : 
+```{r}
+v <- 1:100
+n_swap <- floor(0.05 * length(v))
+swap_indices <- sample(length(v), n_swap)
+v[swap_indices] <- sample(v[swap_indices])
+v
+```
+
+
+```{r}
+one.simu2 <- function(n, func)
+{
+  v <- 1:n
+  n_swap <- floor(0.05 * length(v))
+  swap_indices <- sample(length(v), n_swap)
+  v[swap_indices] <- sample(v[swap_indices])
+  if(func == "insertion_sort"){insertion_sort(v)}
+  if(func == "heap_sort"){heap_sort(v)} 
+  if(func == "insertion_sort_Rcpp"){insertion_sort_Rcpp(v)}
+  if(func == "heap_sort_Rcpp"){heap_sort_Rcpp(v)}
+}
+```
+
+
+```{r benchmark2, echo = FALSE, warning=FALSE, message=FALSE}
+# Function to run benchmark
+benchmark_sorting <- function(n, times = 50)
+{
+  microbenchmark(
+    insertion_sort = one.simu2(n, func = "insertion_sort_Rcpp"),
+    heap_sort = one.simu2(n, func = "heap_sort_Rcpp"),
+    times = times,
+    control = list(gc = FALSE)
+  )
+}
+# Run benchmarks for different n values
+n_values <- c(1000, 10000)
+results <- lapply(n_values, benchmark_sorting)
+
+# Combine results into a single dataframe with n as an identifier
+df_results <- do.call(rbind, Map(cbind, results, n = n_values))
+# Plot with better aesthetics
+ggplot(df_results, aes(x = expr, y = time / 1e6, fill = expr)) +
+  geom_violin(alpha = 0.7) +
+  facet_wrap(~n, scales = "free") +
+  labs(title = "Sorting Algorithm in Rcpp Benchmark",
+       x = "Sorting Algorithm",
+       y = "Execution Time (ms)",
+       fill = "Algorithm") +
+  theme_minimal()
+```
+
+```{r, echo = FALSE, warning=FALSE, message=FALSE}
+library(dplyr)
+df_results %>%
+  group_by(n, expr) %>%
+  summarise(
+    min_time = min(time) / 1e6,   # Convert nanoseconds to milliseconds
+    q1_time = quantile(time, 0.25) / 1e6,
+    median_time = median(time) / 1e6,
+    mean_time = mean(time) / 1e6,
+    q3_time = quantile(time, 0.75) / 1e6,
+    max_time = max(time) / 1e6,
+    .groups = "drop"
+  )
+```
+
+
+L'algorithme d'insertion est ici plus rapide pour la longueur `1000`. Cela est dû au fait que pour un vecteur déjà trié, l'algorithme d'insertion est linéaire et nous sommes dans un cas proche du linéaire.
 
 

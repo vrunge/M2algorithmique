@@ -8,11 +8,11 @@ using namespace Rcpp;
 //' TSP Cheapest Insertion Algorithm (C++ Implementation)
 //'
 //' @description
-//' This function implements the **Cheapest Insertion** heuristic approach for solving the \bold{Traveling Salesman Problem (TSP)} in C++ and is exported to R using Rcpp. 
+//' This function implements the \bold{Cheapest Insertion} heuristic approach for solving the \bold{Traveling Salesman Problem (TSP)} in C++ and is exported to R using Rcpp. 
 //' The algorithm builds the tour by inserting cities into the existing tour in the position that minimizes the increase in tour length.
 //'
 //' The algorithm starts from a specified city and iteratively inserts cities one by one, choosing the insertion position that results in the cheapest (minimum) increase in the total distance at each step. 
-//' In "all" mode, the best tour is selected by testing all possible starting cities and computing the total distance for each tour.
+//' In \code{"all"} mode, the best tour is selected by testing all possible starting cities and computing the total distance for each tour.
 //'
 //' @param data A numeric matrix or data frame where each row represents a city and each column represents the coordinates of that city (e.g., x and y coordinates in 2D space).
 //' @param type A character string specifying how the starting city is chosen. Options include:

@@ -1,11 +1,15 @@
 useDynLib(M2algorithmique, .registration=TRUE)
 
+
 ##### Exports sorting algo
 export(insertion_sort)
 export(heap_sort)
 
 export(insertion_sort_Rcpp)
 export(heap_sort_Rcpp)
+
+##### Exports Dijkstra
+export(generate_random_graph)
 
 ##### Exports TSP algo
 export(TSP_naif)
@@ -25,7 +29,7 @@ export(tour_length)
 
 importFrom("grDevices", "colorRamp", "rgb")
 importFrom("graphics", "segments", "title")
-importFrom("stats", "dist")
+importFrom("stats", "dist", "rnorm")
     
 importFrom(Rcpp, evalCpp)
 

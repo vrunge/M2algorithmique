@@ -1,6 +1,11 @@
 ##  GPL-3 License
 ## Copyright (c) 2025 Vincent Runge
 
+
+
+
+
+
 dijkstra <- function(graph, start, end) 
 {
   # Initialisation

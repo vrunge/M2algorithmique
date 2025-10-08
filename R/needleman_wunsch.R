@@ -1,6 +1,41 @@
 
-
-
+#' Needleman–Wunsch Global Sequence Alignment
+#'
+#' Computes the optimal global alignment between two sequences using the
+#' Needleman–Wunsch algorithm with a simple scoring scheme.
+#'
+#' @param seq1 A character string representing the first sequence (e.g., DNA, RNA, or protein).
+#' @param seq2 A character string representing the second sequence.
+#' @param match Numeric score for a match between two characters. Default is 1.
+#' @param mismatch Numeric penalty for a mismatch between two characters. Default is -1.
+#' @param gap Numeric penalty for a gap (insertion or deletion). Default is -2.
+#'
+#' @return A list containing:
+#' \describe{
+#'   \item{score}{The optimal alignment score (numeric).}
+#'   \item{score_matrix}{The dynamic programming score matrix (matrix).}
+#'   \item{traceback_matrix}{The matrix storing traceback directions ("diag", "up", "left").}
+#'   \item{alignment}{A character vector of length 2 containing the aligned sequences.}
+#' }
+#'
+#' @details
+#' The function implements the Needleman–Wunsch algorithm:
+#' \enumerate{
+#'   \item Initializes a scoring matrix with gap penalties.
+#'   \item Fills the matrix using dynamic programming to compute optimal alignment scores.
+#'   \item Stores traceback directions in a separate matrix to reconstruct the alignment.
+#'   \item Performs a traceback from the bottom-right corner to recover the optimal alignment.
+#' }
+#' Time and space complexity are both O(n*m), where n and m are the lengths of seq1 and seq2.
+#'
+#' @examples
+#' res <- needleman_wunsch("GATTACA", "GATAAA")
+#' res$score
+#' res$alignment
+#' res$score_matrix
+#' res$traceback_matrix
+#'
+#' @export
 needleman_wunsch <- function(seq1, 
                              seq2, 
                              match = 1, 

@@ -45,49 +45,60 @@ List needleman_wunsch_cpp(std::string seq1,
    
    
    // Initialize first row and column
-   for (int i = 1; i <= n; ++i) {
+   for (int i = 1; i <= n; ++i)
+    {
      score(i, 0) = i * gap;
      traceback(i, 0) = "up";
    }
-   for (int j = 1; j <= m; ++j) {
+   for (int j = 1; j <= m; ++j)
+    {
      score(0, j) = j * gap;
      traceback(0, j) = "left";
    }
    
+   double diag_score;
+   double up_score;
+   double left_score;
+   double best;
+   std::string move;
+   
    // Fill DP table
-   for (int i = 1; i <= n; ++i) {
-     for (int j = 1; j <= m; ++j) {
-       
-       double diag_score = score(i - 1, j - 1) + (seq1[i - 1] == seq2[j - 1] ? match : mismatch);
-       double up_score   = score(i - 1, j) + gap;
-       double left_score = score(i, j - 1) + gap;
+   for (int i = 1; i <= n; ++i)
+    {
+     for (int j = 1; j <= m; ++j)
+    {
+      diag_score = score(i - 1, j - 1) + (seq1[i - 1] == seq2[j - 1] ? match : mismatch);
+      up_score   = score(i - 1, j) + gap;
+      left_score = score(i, j - 1) + gap;
        
        // Choose best score
-       double best = diag_score;
-       std::string move = "diag";
+      best = diag_score;
+      move = "diag";
        
-       if (up_score > best) {
+       if (up_score > best)
+        {
          best = up_score;
          move = "up";
        }
-       if (left_score > best) {
+       if (left_score > best)
+        {
          best = left_score;
          move = "left";
        }
-       
        score(i, j) = best;
        traceback(i, j) = move;
      }
    }
    
-   // Traceback
+   // Traceback (Backtracking step)
    std::string align1 = "";
    std::string align2 = "";
    int i = n;
    int j = m;
    
-   while (i > 0 || j > 0) {
-     std::string move = as<std::string>(traceback(i, j));
+   while (i > 0 || j > 0)
+    {
+     move = as<std::string>(traceback(i, j));
      if (move == "diag") {
        align1 = seq1[i - 1] + align1;
        align2 = seq2[j - 1] + align2;

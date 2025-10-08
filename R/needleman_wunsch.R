@@ -77,18 +77,14 @@ needleman_wunsch <- function(seq1,
       best <- max(diag_score, up_score, left_score)
       score[i, j] <- best
       
-      # Store the move that gave the best score
-      if (best == diag_score) {
-        traceback[i, j] <- "diag"
-      } else if (best == up_score) {
-        traceback[i, j] <- "up"
-      } else {
-        traceback[i, j] <- "left"
-      }
+      # Store the move that gave the best score (define the priorities in case of equal scores)
+      if (best == diag_score){traceback[i, j] <- "diag"} 
+      else if (best == up_score){traceback[i, j] <- "up"} 
+      else{traceback[i, j] <- "left"}
     }
   }
   
-  # Traceback phase
+  # Traceback phase (backtracking step)
   alignment1 <- ""
   alignment2 <- ""
   i <- n + 1
@@ -104,11 +100,13 @@ needleman_wunsch <- function(seq1,
       alignment2 <- paste0(s2[j - 1], alignment2)
       i <- i - 1
       j <- j - 1
-    } else if (move == "up") {
+    } else if (move == "up")
+    {
       alignment1 <- paste0(s1[i - 1], alignment1)
       alignment2 <- paste0("-", alignment2)
       i <- i - 1
-    } else if (move == "left") {
+    } else if (move == "left")
+    {
       alignment1 <- paste0("-", alignment1)
       alignment2 <- paste0(s2[j - 1], alignment2)
       j <- j - 1

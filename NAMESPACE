@@ -18,6 +18,10 @@ export(TSP_nearest)
 export(TSP_farthest)
 export(TSP_B_and_B)
 
+
+##### Exports Dijkstra
+export(needleman_wunsch)
+
 export(TSP_naif_Rcpp)
 export(TSP_cheapest_Rcpp)
 export(TSP_nearest_Rcpp)

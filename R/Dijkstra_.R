@@ -3,9 +3,6 @@
 
 
 
-
-
-
 dijkstra <- function(graph, start, end) 
 {
   # Initialisation
@@ -44,3 +41,6 @@ dijkstra <- function(graph, start, end)
   
   return(list(distances = distances, previous = previous))
 }
+
+
+

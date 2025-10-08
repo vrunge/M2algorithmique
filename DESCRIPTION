@@ -5,7 +5,7 @@ Version: 2.0
 Date: 2025-03-14
 Author: Vincent Runge
 Maintainer: Vincent Runge <vincent.runge@univ-evry.fr>
-Description: This package provides implementations of various algorithms, including sorting algorithms in R and Rcpp, algorithms for solving the Traveling Salesman Problem (TSP) and for finding the shortest paths using Dijkstra's algorithm.
+Description: This package provides implementations of various algorithms, including sorting algorithms in R and Rcpp, algorithms for solving the Traveling Salesman Problem (TSP), for sequence alignment (Needleman–Wunsch) and for finding the shortest paths using Dijkstra's algorithm.
 License: GPL-3
 Encoding: UTF-8
 Imports: Rcpp (>= 1.0.5)

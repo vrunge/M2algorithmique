@@ -1,6 +1,6 @@
 #include <Rcpp.h>
 using namespace Rcpp;
-using namespace std;
+
 //' Needleman–Wunsch Global Sequence Alignment (Rcpp version)
 //'
 //' Computes the optimal global alignment between two sequences using the

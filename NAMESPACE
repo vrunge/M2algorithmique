@@ -21,6 +21,7 @@ export(TSP_B_and_B)
 
 ##### Exports Dijkstra
 export(needleman_wunsch)
+export(needleman_wunsch_cpp)
 
 export(TSP_naif_Rcpp)
 export(TSP_cheapest_Rcpp)

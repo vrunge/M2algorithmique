@@ -110,6 +110,39 @@ compute_distances <- function(data) {
     .Call(`_M2algorithmique_compute_distances`, data)
 }
 
+#' Needleman–Wunsch Global Sequence Alignment (Rcpp version)
+#'
+#' Computes the optimal global alignment between two sequences using the
+#' Needleman–Wunsch algorithm with a simple scoring scheme.
+#'
+#' @param seq1 A character string representing the first sequence (e.g., DNA, RNA, or protein).
+#' @param seq2 A character string representing the second sequence.
+#' @param match Numeric score for a match between two characters. Default is 1.
+#' @param mismatch Numeric penalty for a mismatch between two characters. Default is -1.
+#' @param gap Numeric penalty for a gap (insertion or deletion). Default is -2.
+#'
+#' @return A list containing:
+#' \describe{
+#'   \item{score}{The optimal alignment score (numeric).}
+#'   \item{score_matrix}{The dynamic programming score matrix (numeric matrix).}
+#'   \item{traceback_matrix}{The matrix storing traceback directions ("diag", "up", "left").}
+#'   \item{alignment}{A character vector of length 2 containing the aligned sequences.}
+#' }
+#'
+#' @details
+#' The Needleman–Wunsch algorithm initializes a scoring matrix with gap penalties,
+#' fills it via dynamic programming, and performs a traceback to recover the
+#' optimal global alignment. Time and space complexity are both O(n*m).
+#'
+#' @examples
+#' res <- needleman_wunsch_cpp("GATTACA", "GATAAA")
+#' res$score
+#' res$alignment
+#' @export
+needleman_wunsch_cpp <- function(seq1, seq2, match = 1, mismatch = -1, gap = -2) {
+    .Call(`_M2algorithmique_needleman_wunsch_cpp`, seq1, seq2, match, mismatch, gap)
+}
+
 #' Insertion Sort Algorithm (C++ Implementation)
 #'
 #' @description

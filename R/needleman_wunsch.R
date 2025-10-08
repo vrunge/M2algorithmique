@@ -74,13 +74,13 @@ needleman_wunsch <- function(seq1,
       up_score   <- score[i - 1, j] + gap
       left_score <- score[i, j - 1] + gap
       
-      best <- max(diag_score, up_score, left_score)
+      best <- max(c(diag_score, up_score, left_score))
       score[i, j] <- best
       
-      # Store the move that gave the best score (define the priorities in case of equal scores)
-      if (best == diag_score){traceback[i, j] <- "diag"} 
-      else if (best == up_score){traceback[i, j] <- "up"} 
-      else{traceback[i, j] <- "left"}
+      # Store the move that gave the best score 
+      # (define the priorities in case of equal scores)
+      arg_best <- which.max(c(diag_score, up_score, left_score))
+      traceback[i, j] <- c("diag", "up", "left")[arg_best]
     }
   }
   

@@ -57,6 +57,21 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// needleman_wunsch_cpp
+List needleman_wunsch_cpp(std::string seq1, std::string seq2, double match, double mismatch, double gap);
+RcppExport SEXP _M2algorithmique_needleman_wunsch_cpp(SEXP seq1SEXP, SEXP seq2SEXP, SEXP matchSEXP, SEXP mismatchSEXP, SEXP gapSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< std::string >::type seq1(seq1SEXP);
+    Rcpp::traits::input_parameter< std::string >::type seq2(seq2SEXP);
+    Rcpp::traits::input_parameter< double >::type match(matchSEXP);
+    Rcpp::traits::input_parameter< double >::type mismatch(mismatchSEXP);
+    Rcpp::traits::input_parameter< double >::type gap(gapSEXP);
+    rcpp_result_gen = Rcpp::wrap(needleman_wunsch_cpp(seq1, seq2, match, mismatch, gap));
+    return rcpp_result_gen;
+END_RCPP
+}
 // insertion_sort_Rcpp
 std::vector<double> insertion_sort_Rcpp(std::vector<double> v);
 RcppExport SEXP _M2algorithmique_insertion_sort_Rcpp(SEXP vSEXP) {
@@ -85,6 +100,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_M2algorithmique_TSP_cheapest_Rcpp", (DL_FUNC) &_M2algorithmique_TSP_cheapest_Rcpp, 2},
     {"_M2algorithmique_TSP_nearest_Rcpp", (DL_FUNC) &_M2algorithmique_TSP_nearest_Rcpp, 2},
     {"_M2algorithmique_compute_distances", (DL_FUNC) &_M2algorithmique_compute_distances, 1},
+    {"_M2algorithmique_needleman_wunsch_cpp", (DL_FUNC) &_M2algorithmique_needleman_wunsch_cpp, 5},
     {"_M2algorithmique_insertion_sort_Rcpp", (DL_FUNC) &_M2algorithmique_insertion_sort_Rcpp, 1},
     {"_M2algorithmique_heap_sort_Rcpp", (DL_FUNC) &_M2algorithmique_heap_sort_Rcpp, 1},
     {NULL, NULL, 0}
